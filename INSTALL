@@ -1,0 +1,32 @@
+INTRODUCTION AND REQUIREMENTS
+
+The following tools are required to compile Shape-it:
+
+	- The latest version of the OpenBabel source code (at least version 2.3)
+	- A C++ compiler (like g++) 
+	- A makefile system (like GNU make) 
+	- CMake system (www.cmake.org)
+
+If you want to install globally on your system, you will need root access, and should follow these instructions.
+
+
+INSTALL GLOBALLY (YOU NEED ROOT ACCESS)
+
+(1) Open a command window, and decompress the downloaded file with following command:
+
+> tar -xvf shape-it-1.0.1.tar.gz
+
+This will create a folder called 'shape-it-1.0.1'. 
+
+(2) You now need to configure and compile Shape-it. Run the following commands, one after the other:
+
+> cd shape-it-1.0.1
+> cmake CMakeLists.txt
+> make
+
+(3) If you have root permissions, you can install Shape-it globally. As root, run the following command:
+
+> make install
+> make clean
+
+
