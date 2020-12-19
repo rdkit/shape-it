@@ -9,8 +9,6 @@ find_package (OpenBabel3 REQUIRED)
 set (VERSION_MAJOR 1)
 set (VERSION_MINOR 0)
 set (VERSION_PATCH 1)
-SET(ENV{LD_LIBRARY_PATH} "/home/iwatobipen/miniconda3/envs/chemoinfo/lib
-:$ENV{LD_LIBRARY_PATH}")
 file (WRITE  ${PROJECT_SOURCE_DIR}/include/config.h "#define SHAPEIT_VERSION ${VERSION_MAJOR}\n")
 file (APPEND ${PROJECT_SOURCE_DIR}/include/config.h "#define SHAPEIT_RELEASE ${VERSION_MINOR}\n")
 file (APPEND ${PROJECT_SOURCE_DIR}/include/config.h "#define SHAPEIT_SUBRELEASE ${VERSION_PATCH}\n")
