@@ -15,7 +15,7 @@ git clone https://github.com/iwatobipen/shape-it-ob3.git
 cd shape-it-ob3
 mkdir biuild
 cd build
-cmake -DCMAKE_INSTALL_DIR=<where you want to insatall> ..
+cmake -DCMAKE_INSTALL_PREFIX=<where you want to insatall> ..
 make
 make install
 ```
