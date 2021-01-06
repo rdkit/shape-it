@@ -118,4 +118,21 @@ M  END)CTAB";
     auto solution = alignMols(*refMol, m2);
     CHECK(solution.score == Approx(1.00).margin(0.01));
   }
+  SECTION("align to volume") {
+    GaussianVolume refVolume;
+    listAtomVolumes(*refMol, refVolume);
+    initOrientation(refVolume);
+    auto solution = alignMolToVolume(refVolume, *prbMol);
+
+    refVolume.gaussians.clear();
+    for (std::vector<std::vector<unsigned int> *>::iterator si =
+             refVolume.childOverlaps.begin();
+         si != refVolume.childOverlaps.end(); ++si) {
+      if (*si != NULL) {
+        delete *si;
+        *si = NULL;
+      }
+    }
+    refVolume.childOverlaps.clear();
+  }
 }

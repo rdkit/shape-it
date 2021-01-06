@@ -45,8 +45,8 @@ class ROMol;
 }
 using Molecule = RDKit::ROMol;
 #endif
-void positionMolecule(Molecule &, Coordinate &, SiMath::Matrix &);
-void repositionMolecule(Molecule &, SiMath::Matrix &, Coordinate &);
-void rotateMolecule(Molecule &, SiMath::Vector &);
+void positionMolecule(Molecule &, const Coordinate &, const SiMath::Matrix &);
+void repositionMolecule(Molecule &, const SiMath::Matrix &, const Coordinate &);
+void rotateMolecule(Molecule &, const SiMath::Vector &);
 
 #endif

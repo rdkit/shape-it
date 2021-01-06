@@ -14,10 +14,10 @@ This file is part of Shape-it.
 #include <moleculeRotation.h>
 #include <shapeAlignment.h>
 
-SolutionInfo alignMols(const Molecule &refMol, const Molecule &dbMol,
-                       const std::string &whichScore, double maxIter,
-                       double cutoff, BestResults *bestHits) {
-  // Create the refence set of Gaussians
+SolutionInfo
+alignMols(const Molecule &refMol, const Molecule &dbMol,
+          const std::string &whichScore, double maxIter, double cutoff,
+          BestResults *bestHits) { // Create the refence set of Gaussians
   GaussianVolume refVolume;
 
   // List all Gaussians and their respective intersections
@@ -26,7 +26,21 @@ SolutionInfo alignMols(const Molecule &refMol, const Molecule &dbMol,
   // Move the Gaussian towards its center of geometry and align with principal
   // axes
   initOrientation(refVolume);
+  auto res =
+      alignMolToVolume(refVolume, dbMol, whichScore, maxIter, cutoff, bestHits);
 
+#ifndef USE_RDKIT
+  res.refName = refMol.GetTitle();
+#else
+  refMol.getProp("_Name", res.refName);
+#endif
+  return res;
+}
+
+SolutionInfo alignMolToVolume(const GaussianVolume &refVolume,
+                              const Molecule &dbMol,
+                              const std::string &whichScore, double maxIter,
+                              double cutoff, BestResults *bestHits) {
   // Create the set of Gaussians of database molecule
   GaussianVolume dbVolume;
   listAtomVolumes(dbMol, dbVolume);
@@ -38,13 +52,12 @@ SolutionInfo alignMols(const Molecule &refMol, const Molecule &dbMol,
 
   SolutionInfo bestSolution =
       std::move(alignVolumes(refVolume, dbVolume, whichScore, maxIter));
+  bestSolution.refName = "";
 #ifndef USE_RDKIT
   bestSolution.dbMol = dbMol;
-  bestSolution.refName = refMol.GetTitle();
   bestSolution.dbName = dbMol.GetTitle();
 #else
   bestSolution.dbMol = dbMol;
-  refMol.getProp("_Name", bestSolution.refName);
   dbMol.getProp("_Name", bestSolution.dbName);
 #endif
 
@@ -60,16 +73,6 @@ SolutionInfo alignMols(const Molecule &refMol, const Molecule &dbMol,
     }
   }
   dbVolume.childOverlaps.clear();
-  refVolume.gaussians.clear();
-  for (std::vector<std::vector<unsigned int> *>::iterator si =
-           refVolume.childOverlaps.begin();
-       si != refVolume.childOverlaps.end(); ++si) {
-    if (*si != NULL) {
-      delete *si;
-      *si = NULL;
-    }
-  }
-  refVolume.childOverlaps.clear();
 
   if (bestSolution.score < cutoff) {
     return bestSolution;

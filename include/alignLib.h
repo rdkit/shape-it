@@ -28,6 +28,12 @@ SolutionInfo alignMols(const Molecule &refMol, const Molecule &dbMol,
                        double maxIter = 0, double cutoff = 0.0,
                        BestResults *bestHits = nullptr);
 
+SolutionInfo alignMolToVolume(const GaussianVolume &refVolume,
+                              const Molecule &dbMol,
+                              const std::string &whichScore = tanimoto,
+                              double maxIter = 0, double cutoff = 0.0,
+                              BestResults *bestHits = nullptr);
+
 SolutionInfo alignVolumes(const GaussianVolume &refVolume,
                           const GaussianVolume &dbVolume,
                           const std::string &whichScore, double maxIter);

@@ -33,8 +33,8 @@ Shape-it is linked against OpenBabel version 2.
 #include <openbabel/atom.h>
 #include <openbabel/mol.h>
 
-void positionMolecule(OpenBabel::OBMol &m, Coordinate &centroid,
-                      SiMath::Matrix &rotation) {
+void positionMolecule(OpenBabel::OBMol &m, const Coordinate &centroid,
+                      const SiMath::Matrix &rotation) {
   std::vector<OpenBabel::OBAtom *>::iterator i;
   for (OpenBabel::OBAtom *a = m.BeginAtom(i); a; a = m.NextAtom(i)) {
     // Translate point
@@ -50,8 +50,8 @@ void positionMolecule(OpenBabel::OBMol &m, Coordinate &centroid,
   return;
 }
 
-void repositionMolecule(OpenBabel::OBMol &m, SiMath::Matrix &rotation,
-                        Coordinate &centroid) {
+void repositionMolecule(OpenBabel::OBMol &m, const SiMath::Matrix &rotation,
+                        const Coordinate &centroid) {
   std::vector<OpenBabel::OBAtom *>::iterator i;
   for (OpenBabel::OBAtom *a = m.BeginAtom(i); a; a = m.NextAtom(i)) {
     // Get coordinates
@@ -69,7 +69,7 @@ void repositionMolecule(OpenBabel::OBMol &m, SiMath::Matrix &rotation,
   return;
 }
 
-void rotateMolecule(OpenBabel::OBMol &m, SiMath::Vector &rotor) {
+void rotateMolecule(OpenBabel::OBMol &m, const SiMath::Vector &rotor) {
   // Build rotation matrix
   SiMath::Matrix rot(3, 3, 0.0);
   double r1 = rotor[1] * rotor[1];
@@ -105,8 +105,8 @@ void rotateMolecule(OpenBabel::OBMol &m, SiMath::Vector &rotor) {
 #include <GraphMol/Conformer.h>
 #include <GraphMol/RDKitBase.h>
 
-void positionMolecule(RDKit::ROMol &m, Coordinate &centroid,
-                      SiMath::Matrix &rotation) {
+void positionMolecule(RDKit::ROMol &m, const Coordinate &centroid,
+                      const SiMath::Matrix &rotation) {
   RDKit::Conformer &conf = m.getConformer();
   RDGeom::Point3D rdcentroid(centroid.x, centroid.y, centroid.z);
   for (unsigned int i = i; i < m.getNumAtoms(); ++i) {
@@ -121,8 +121,8 @@ void positionMolecule(RDKit::ROMol &m, Coordinate &centroid,
   }
 }
 
-void repositionMolecule(RDKit::ROMol &m, SiMath::Matrix &rotation,
-                        Coordinate &centroid) {
+void repositionMolecule(RDKit::ROMol &m, const SiMath::Matrix &rotation,
+                        const Coordinate &centroid) {
   RDKit::Conformer &conf = m.getConformer();
   RDGeom::Point3D rdcentroid(centroid.x, centroid.y, centroid.z);
   for (unsigned int i = i; i < m.getNumAtoms(); ++i) {
@@ -139,7 +139,7 @@ void repositionMolecule(RDKit::ROMol &m, SiMath::Matrix &rotation,
   return;
 }
 
-void rotateMolecule(RDKit::ROMol &m, SiMath::Vector &rotor) {
+void rotateMolecule(RDKit::ROMol &m, const SiMath::Vector &rotor) {
   RDKit::Conformer &conf = m.getConformer();
   // Build rotation matrix
   SiMath::Matrix rot(3, 3, 0.0);
