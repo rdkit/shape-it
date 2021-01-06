@@ -48,7 +48,7 @@ ShapeAlignment::~ShapeAlignment(void) {
   // Clear the matrix map
   for (MatIter mi = _matrixMap.begin(); mi != _matrixMap.end(); ++mi) {
     if (mi->second != NULL) {
-      delete mi->second;
+      delete[] mi->second;
       mi->second = NULL;
     }
   }

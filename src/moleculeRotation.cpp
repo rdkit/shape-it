@@ -109,7 +109,7 @@ void positionMolecule(RDKit::ROMol &m, const Coordinate &centroid,
                       const SiMath::Matrix &rotation) {
   RDKit::Conformer &conf = m.getConformer();
   RDGeom::Point3D rdcentroid(centroid.x, centroid.y, centroid.z);
-  for (unsigned int i = i; i < m.getNumAtoms(); ++i) {
+  for (unsigned int i = 0; i < m.getNumAtoms(); ++i) {
     RDGeom::Point3D tp = conf.getAtomPos(i) - rdcentroid;
     conf.setAtomPos(
         i, RDGeom::Point3D(rotation[0][0] * tp.x + rotation[1][0] * tp.y +
@@ -125,7 +125,7 @@ void repositionMolecule(RDKit::ROMol &m, const SiMath::Matrix &rotation,
                         const Coordinate &centroid) {
   RDKit::Conformer &conf = m.getConformer();
   RDGeom::Point3D rdcentroid(centroid.x, centroid.y, centroid.z);
-  for (unsigned int i = i; i < m.getNumAtoms(); ++i) {
+  for (unsigned int i = 0; i < m.getNumAtoms(); ++i) {
     RDGeom::Point3D tp = conf.getAtomPos(i);
     conf.setAtomPos(
         i, RDGeom::Point3D(rotation[0][0] * tp.x + rotation[0][1] * tp.y +
@@ -157,7 +157,7 @@ void rotateMolecule(RDKit::ROMol &m, const SiMath::Vector &rotor) {
   rot[2][1] = 2.0 * (rotor[2] * rotor[3] + rotor[0] * rotor[1]);
   rot[2][2] = 1.0 - 2 * r2 - 2 * r1;
 
-  for (unsigned int i = i; i < m.getNumAtoms(); ++i) {
+  for (unsigned int i = 0; i < m.getNumAtoms(); ++i) {
     RDGeom::Point3D tp = conf.getAtomPos(i);
     conf.setAtomPos(
         i, RDGeom::Point3D(
