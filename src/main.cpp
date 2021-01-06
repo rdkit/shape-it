@@ -44,6 +44,7 @@ Shape-it is linked against OpenBabel version 2.
 #endif
 
 // Pharao
+#include <alignLib.h>
 #include <alignmentInfo.h>
 #include <atomGaussian.h>
 #include <bestResults.h>
@@ -55,10 +56,6 @@ Shape-it is linked against OpenBabel version 2.
 #include <printHeader.h>
 #include <printUsage.h>
 #include <shapeAlignment.h>
-
-extern SolutionInfo alignVolumes(GaussianVolume &refVolume,
-                                 GaussianVolume &dbVolume,
-                                 const std::string &whichScore, double maxIter);
 
 //*--------------------------------------------------------------------------*//
 //* MAIN                                                                MAIN
