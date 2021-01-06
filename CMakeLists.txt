@@ -36,7 +36,7 @@ else(NOT BUILD_RDKIT_SUPPORT)
   set(RDKit_THREAD_LIBS Threads::Threads)
 endif(NOT BUILD_RDKIT_SUPPORT)
 
-add_library (shapeit_lib SHARED src/alignmentInfo.cpp src/atomGaussian.cpp 
+add_library (shapeit_lib SHARED src/alignLib.cpp src/alignmentInfo.cpp src/atomGaussian.cpp 
     src/bestResults.cpp src/coordinate.cpp
     src/gaussianVolume.cpp src/moleculeRotation.cpp src/shapeAlignment.cpp 
     src/siMath.cpp src/solutionInfo.cpp)

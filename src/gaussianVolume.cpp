@@ -471,7 +471,7 @@ void initOrientation(GaussianVolume &gv) {
   return;
 }
 
-double atomOverlap(GaussianVolume &gRef, GaussianVolume &gDb) {
+double atomOverlap(const GaussianVolume &gRef, const GaussianVolume &gDb) {
   // Create a queue to hold the pairs to process
   std::queue<std::pair<unsigned int, unsigned int>> processQueue;
 
@@ -605,7 +605,7 @@ double atomOverlap(GaussianVolume &gRef, GaussianVolume &gDb) {
   return overlapVol;
 }
 
-double getScore(std::string &id, double Voa, double Vra, double Vda) {
+double getScore(const std::string &id, double Voa, double Vra, double Vda) {
   // set the score by which molecules are being compared
   if (id == tanimoto) {
     return Voa / (Vra + Vda - Voa);
@@ -618,7 +618,7 @@ double getScore(std::string &id, double Voa, double Vra, double Vda) {
   return 0.0;
 }
 
-void checkVolumes(GaussianVolume &gRef, GaussianVolume &gDb,
+void checkVolumes(const GaussianVolume &gRef, const GaussianVolume &gDb,
                   AlignmentInfo &res) {
   if (res.overlap > gRef.overlap) {
     res.overlap = gRef.overlap;

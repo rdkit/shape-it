@@ -56,8 +56,13 @@ Shape-it is linked against OpenBabel version 2.
 #include <printUsage.h>
 #include <shapeAlignment.h>
 
+extern SolutionInfo alignVolumes(GaussianVolume &refVolume,
+                                 GaussianVolume &dbVolume,
+                                 const std::string &whichScore, double maxIter);
+
 //*--------------------------------------------------------------------------*//
-//* MAIN                                                                MAIN *//
+//* MAIN                                                                MAIN
+//*//
 //*--------------------------------------------------------------------------*//
 int main(int argc, char *argv[]) {
   // Initialise random number generator
@@ -170,13 +175,6 @@ int main(int argc, char *argv[]) {
   dbOutWriter.write(refMol);
 #endif
 
-  // Create a class to hold the best solution of an iteration
-  SolutionInfo bestSolution;
-  bestSolution.refName = refName;
-  bestSolution.refAtomVolume = refVolume.overlap;
-  bestSolution.refCenter = refVolume.centroid;
-  bestSolution.refRotation = refVolume.rotation;
-
   // Open database stream
   unsigned molCount(0);
   std::ostringstream ss;
@@ -227,7 +225,6 @@ int main(int argc, char *argv[]) {
       dbMol.setProp("_Name", dbName);
 #endif
     }
-    bestSolution.dbName = dbName;
 
     // Create the set of Gaussians of database molecule
     GaussianVolume dbVolume;
@@ -237,6 +234,7 @@ int main(int argc, char *argv[]) {
     AlignmentInfo res;
     double bestScore(0.0);
 
+    SolutionInfo bestSolution;
     if (uo.scoreOnly) {
       res.overlap = atomOverlap(refVolume, dbVolume);
       res.rotor[0] = 1.0;
@@ -244,39 +242,18 @@ int main(int argc, char *argv[]) {
                            dbVolume.overlap);
     } else {
       initOrientation(dbVolume);
-      ShapeAlignment aligner(refVolume, dbVolume);
-      aligner.setMaxIterations(uo.maxIter);
 
-      for (unsigned int l(0); l < 4; ++l) {
-        SiMath::Vector quat(4, 0.0);
-        quat[l] = 1.0;
-        AlignmentInfo nextRes = aligner.gradientAscent(quat);
-        checkVolumes(refVolume, dbVolume, nextRes);
-        double ss = getScore(uo.whichScore, nextRes.overlap, refVolume.overlap,
-                             dbVolume.overlap);
-        if (ss > bestScore) {
-          res = nextRes;
-          bestScore = ss;
-        }
-
-        if (bestScore > 0.98) {
-          break;
-        }
-      }
-
-      // Check if additional simulated annealing steps are requested and start
-      // from the current best solution
-      if (uo.maxIter > 0) {
-        AlignmentInfo nextRes = aligner.simulatedAnnealing(res.rotor);
-        checkVolumes(refVolume, dbVolume, nextRes);
-        double ss = getScore(uo.whichScore, nextRes.overlap, refVolume.overlap,
-                             dbVolume.overlap);
-        if (ss > bestScore) {
-          bestScore = ss;
-          res = nextRes;
-        }
-      }
+      bestSolution = std::move(
+          alignVolumes(refVolume, dbVolume, uo.whichScore, uo.maxIter));
     }
+
+#ifndef USE_RDKIT
+    bestSolution.dbMol = dbMol;
+#else
+    bestSolution.dbMol = dbMol;
+#endif
+    bestSolution.refName = refName;
+    bestSolution.dbName = dbName;
 
     // Cleanup local pointers to atom-gaussians
     dbVolume.gaussians.clear();
@@ -290,16 +267,6 @@ int main(int argc, char *argv[]) {
       }
     }
     dbVolume.childOverlaps.clear();
-
-    // Optimal alignment information is stored in res and bestScore
-    // => result reporting and post-processing
-    updateSolutionInfo(bestSolution, res, bestScore, dbVolume);
-#ifndef USE_RDKIT
-    bestSolution.dbMol = dbMol;
-#else
-    bestSolution.dbMol = dbMol;
-#endif
-    bestSolution.dbName = dbName;
 
     // At this point the information of the solution is stored in bestSolution
     // Check if the result is better than the cutoff
@@ -341,9 +308,6 @@ int main(int argc, char *argv[]) {
     if ((uo.bestHits == 0) && !uo.scoreOutFile.empty()) {
       bestSolution.printScores(uo);
     }
-
-    // reset best solution
-    bestSolution.score = 0.0;
 
 #ifndef USE_RDKIT
     // Clear current molecule

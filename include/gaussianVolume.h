@@ -84,9 +84,10 @@ public:
 
 void listAtomVolumes(Molecule &mol, GaussianVolume &gv);
 void initOrientation(GaussianVolume &);
-double atomOverlap(GaussianVolume &, GaussianVolume &);
+double atomOverlap(const GaussianVolume &, const GaussianVolume &);
 double GAlpha(unsigned int);
-double getScore(std::string &, double, double, double);
-void checkVolumes(GaussianVolume &, GaussianVolume &, AlignmentInfo &);
+double getScore(const std::string &, double, double, double);
+void checkVolumes(const GaussianVolume &, const GaussianVolume &,
+                  AlignmentInfo &);
 
 #endif
