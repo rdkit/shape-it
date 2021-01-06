@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 2.6) 
+cmake_minimum_required (VERSION 3.6) 
 
 # Project
 project (shape-it)
@@ -21,11 +21,17 @@ file (GLOB_RECURSE sourcefiles "${PROJECT_SOURCE_DIR}/src/*.cpp")
 
 # Include files
 include_directories (${PROJECT_SOURCE_DIR}/include)
-include_directories (${OPENBABEL3_INCLUDE_DIRS})
+include_directories (${OPENBABEL3_INCLUDE_DIRS}/openbabel3)
 
+add_library (shapeit_lib SHARED src/alignmentInfo.cpp src/atomGaussian.cpp 
+    src/bestResults.cpp src/coordinate.cpp
+    src/gaussianVolume.cpp src/moleculeRotation.cpp src/shapeAlignment.cpp 
+    src/siMath.cpp src/solutionInfo.cpp)
+target_include_directories(shapeit_lib PUBLIC ${OPENBABEL3_INCLUDE_DIRS})
 # Executables
-add_executable (${PROJECT_NAME} ${sourcefiles})
-target_link_libraries (${PROJECT_NAME} ${OPENBABEL3_LIBRARIES})
+add_executable (${PROJECT_NAME} src/options.cpp src/main.cpp src/mainErr.cpp 
+  src/printHeader.cpp src/printUsage.cpp src/options.cpp src/parseCommandLine.cpp)
+target_link_libraries (${PROJECT_NAME} shapeit_lib ${OPENBABEL3_LIBRARIES})
 install (TARGETS ${PROJECT_NAME} DESTINATION bin)
 message ("Installation directory of executable: ${CMAKE_INSTALL_PREFIX}/bin")
 
