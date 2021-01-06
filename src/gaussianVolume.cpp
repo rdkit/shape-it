@@ -28,11 +28,18 @@ Shape-it is linked against OpenBabel version 2.
 
 #include <gaussianVolume.h>
 
+#ifndef USE_RDKIT
 // OpenBabel
 #include <openbabel/atom.h>
 #include <openbabel/data.h>
 #include <openbabel/elements.h>
 #include <openbabel/mol.h>
+#else
+#include <GraphMol/PeriodicTable.h>
+#include <GraphMol/ROMol.h>
+#endif
+
+// OpenBabel
 
 GaussianVolume::GaussianVolume(void)
     : volume(0.0), overlap(0.0), centroid(0.0, 0.0, 0.0), rotation(3, 3, 0.0),
@@ -108,9 +115,12 @@ double GAlpha(unsigned int an) {
   return 1.074661303;
 };
 
-void listAtomVolumes(OpenBabel::OBMol &mol, GaussianVolume &gv) {
+namespace {
+#ifndef USE_RDKIT
+
+unsigned int initFromMol(Molecule &mol, GaussianVolume &gv) {
   // Prepare the vector to store the atom and overlap volumes;
-  unsigned int N(0);
+  unsigned int N = 0;
   std::vector<OpenBabel::OBAtom *>::iterator ai;
   for (OpenBabel::OBAtom *a = mol.BeginAtom(ai); a; a = mol.NextAtom(ai)) {
     if (a->GetAtomicNum() == 1) {
@@ -126,18 +136,6 @@ void listAtomVolumes(OpenBabel::OBMol &mol, GaussianVolume &gv) {
   gv.centroid.x = 0;
   gv.centroid.y = 0;
   gv.centroid.z = 0;
-
-  // Vector to keep track of parents of an overlap
-  std::vector<std::pair<unsigned int, unsigned int>> parents(N);
-
-  // Create a vector to keep track of the overlaps
-  // Overlaps are stored as sets
-  std::vector<std::set<unsigned int> *> overlaps(N);
-  std::set<unsigned int>::iterator setIter;
-
-  // Start by iterating over the single atoms and build map of overlaps
-  // OpenBabel::OBElementTable et;
-  // OpenBabel::OBElements et;
   int atomIndex = 0; // keeps track of the atoms processed so far
   int vecIndex = N;  // keeps track of the last element added to the vectors
   for (OpenBabel::OBAtom *a = mol.BeginAtom(ai); a; a = mol.NextAtom(ai)) {
@@ -157,8 +155,72 @@ void listAtomVolumes(OpenBabel::OBMol &mol, GaussianVolume &gv) {
     double radius = OpenBabel::OBElements::GetVdwRad(a->GetAtomicNum());
     gv.gaussians[atomIndex].volume =
         (4.0 * PI / 3.0) * radius * radius * radius;
-    gv.gaussians[atomIndex].nbr = 1;
+    ++atomIndex;
+  }
+  return N;
+}
+#else
+unsigned int initFromMol(Molecule &mol, GaussianVolume &gv) {
+  // Prepare the vector to store the atom and overlap volumes;
+  unsigned int N = 0;
+  for (const auto a : mol.atoms()) {
+    if (a->getAtomicNum() != 1) {
+      ++N;
+    }
+  }
+  gv.gaussians.resize(N);
+  gv.childOverlaps.resize(N);
+  gv.levels.push_back(N); // first level
+  gv.volume = 0.0;
+  gv.centroid.x = 0;
+  gv.centroid.y = 0;
+  gv.centroid.z = 0;
+  int atomIndex = 0; // keeps track of the atoms processed so far
+  int vecIndex = N;  // keeps track of the last element added to the vectors
+  const auto &conf = mol.getConformer();
+  for (const auto a : mol.atoms()) {
+    // Skip hydrogens
+    if (a->getAtomicNum() == 1) {
+      continue;
+    }
 
+    // First atom append self to the list
+    // Store it at [index]
+    const auto &p = conf.getAtomPos(a->getIdx());
+    gv.gaussians[atomIndex].center.x = p.x;
+    gv.gaussians[atomIndex].center.y = p.y;
+    gv.gaussians[atomIndex].center.z = p.z;
+    gv.gaussians[atomIndex].alpha = GAlpha(a->getAtomicNum());
+    gv.gaussians[atomIndex].C = GCI;
+    // double radius = et.GetVdwRad(a->GetAtomicNum());
+    double radius =
+        RDKit::PeriodicTable::getTable()->getRvdw(a->getAtomicNum());
+    gv.gaussians[atomIndex].volume =
+        (4.0 * PI / 3.0) * radius * radius * radius;
+    ++atomIndex;
+  }
+  return N;
+}
+
+#endif
+
+} // namespace
+
+void listAtomVolumes(Molecule &mol, GaussianVolume &gv) {
+  // Prepare the vector to store the atom and overlap volumes;
+  unsigned int N = initFromMol(mol, gv);
+
+  // Vector to keep track of parents of an overlap
+  std::vector<std::pair<unsigned int, unsigned int>> parents(N);
+
+  // Create a vector to keep track of the overlaps
+  // Overlaps are stored as sets
+  std::vector<std::set<unsigned int> *> overlaps(N);
+  std::set<unsigned int>::iterator setIter;
+
+  // Start by iterating over the single atoms and build map of overlaps
+  int vecIndex = N; // keeps track of the last element added to the vectors
+  for (unsigned int atomIndex = 0; atomIndex < N; ++atomIndex) {
     // Add empty child overlaps
     std::vector<unsigned int> *vec = new std::vector<unsigned int>();
     gv.childOverlaps[atomIndex] = vec;
@@ -212,13 +274,10 @@ void listAtomVolumes(OpenBabel::OBMol &mol, GaussianVolume &gv) {
       // Move to next index in vector
       ++vecIndex;
     }
-
-    // Update atom index
-    ++atomIndex;
   }
 
   // Position in list of gaussians where atom gaussians end
-  unsigned int startLevel = atomIndex;
+  unsigned int startLevel = N;
   unsigned int nextLevel = gv.gaussians.size();
 
   // Update level information

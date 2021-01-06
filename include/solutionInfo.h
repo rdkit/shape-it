@@ -35,10 +35,9 @@ Shape-it is linked against OpenBabel version 2.
 
 #ifndef USE_RDKIT
 // OpenBabel
-#include <openbabel/generic.h>
 #include <openbabel/mol.h>
 #else
-#include <GraphMol/ROMol.h>
+#include <GraphMol/RWMol.h>
 #endif
 
 // Shape-it
@@ -55,7 +54,11 @@ public:
   Coordinate refCenter;
   SiMath::Matrix refRotation;
 
+#ifndef USE_RDKIT
   OpenBabel::OBMol dbMol;
+#else
+  RDKit::RWMol dbMol;
+#endif
   std::string dbName;
   double dbAtomVolume;
   Coordinate dbCenter;

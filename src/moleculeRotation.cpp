@@ -28,6 +28,7 @@ Shape-it is linked against OpenBabel version 2.
 
 #include <moleculeRotation.h>
 
+#ifndef USE_RDKIT
 // OpenBabel
 #include <openbabel/atom.h>
 #include <openbabel/mol.h>
@@ -99,3 +100,71 @@ void rotateMolecule(OpenBabel::OBMol &m, SiMath::Vector &rotor) {
   }
   return;
 }
+#else
+#include <Geometry/point.h>
+#include <GraphMol/Conformer.h>
+#include <GraphMol/RDKitBase.h>
+
+void positionMolecule(RDKit::ROMol &m, Coordinate &centroid,
+                      SiMath::Matrix &rotation) {
+  RDKit::Conformer &conf = m.getConformer();
+  RDGeom::Point3D rdcentroid(centroid.x, centroid.y, centroid.z);
+  for (unsigned int i = i; i < m.getNumAtoms(); ++i) {
+    RDGeom::Point3D tp = conf.getAtomPos(i) - rdcentroid;
+    conf.setAtomPos(
+        i, RDGeom::Point3D(rotation[0][0] * tp.x + rotation[1][0] * tp.y +
+                               rotation[2][0] * tp.z,
+                           rotation[0][1] * tp.x + rotation[1][1] * tp.y +
+                               rotation[2][1] * tp.z,
+                           rotation[0][2] * tp.x + rotation[1][2] * tp.y +
+                               rotation[2][2] * tp.z));
+  }
+}
+
+void repositionMolecule(RDKit::ROMol &m, SiMath::Matrix &rotation,
+                        Coordinate &centroid) {
+  RDKit::Conformer &conf = m.getConformer();
+  RDGeom::Point3D rdcentroid(centroid.x, centroid.y, centroid.z);
+  for (unsigned int i = i; i < m.getNumAtoms(); ++i) {
+    RDGeom::Point3D tp = conf.getAtomPos(i);
+    conf.setAtomPos(
+        i, RDGeom::Point3D(rotation[0][0] * tp.x + rotation[0][1] * tp.y +
+                               rotation[0][2] * tp.z,
+                           rotation[1][0] * tp.x + rotation[1][1] * tp.y +
+                               rotation[1][2] * tp.z,
+                           rotation[2][0] * tp.x + rotation[2][1] * tp.y +
+                               rotation[2][2] * tp.z));
+    conf.getAtomPos(i) += rdcentroid;
+  }
+  return;
+}
+
+void rotateMolecule(RDKit::ROMol &m, SiMath::Vector &rotor) {
+  RDKit::Conformer &conf = m.getConformer();
+  // Build rotation matrix
+  SiMath::Matrix rot(3, 3, 0.0);
+  double r1 = rotor[1] * rotor[1];
+  double r2 = rotor[2] * rotor[2];
+  double r3 = rotor[3] * rotor[3];
+
+  rot[0][0] = 1.0 - 2.0 * r2 - 2.0 * r3;
+  rot[0][1] = 2.0 * (rotor[1] * rotor[2] - rotor[0] * rotor[3]);
+  rot[0][2] = 2.0 * (rotor[1] * rotor[3] + rotor[0] * rotor[2]);
+  rot[1][0] = 2.0 * (rotor[1] * rotor[2] + rotor[0] * rotor[3]);
+  rot[1][1] = 1.0 - 2 * r3 - 2 * r1;
+  rot[1][2] = 2.0 * (rotor[2] * rotor[3] - rotor[0] * rotor[1]);
+  rot[2][0] = 2.0 * (rotor[1] * rotor[3] - rotor[0] * rotor[2]);
+  rot[2][1] = 2.0 * (rotor[2] * rotor[3] + rotor[0] * rotor[1]);
+  rot[2][2] = 1.0 - 2 * r2 - 2 * r1;
+
+  for (unsigned int i = i; i < m.getNumAtoms(); ++i) {
+    RDGeom::Point3D tp = conf.getAtomPos(i);
+    conf.setAtomPos(
+        i, RDGeom::Point3D(
+               rot[0][0] * tp.x + rot[0][1] * tp.y + rot[0][2] * tp.z,
+               rot[1][0] * tp.x + rot[1][1] * tp.y + rot[1][2] * tp.z,
+               rot[2][0] * tp.x + rot[2][1] * tp.y + rot[2][2] * tp.z));
+  }
+}
+
+#endif

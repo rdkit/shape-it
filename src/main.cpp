@@ -33,9 +33,15 @@ Shape-it is linked against OpenBabel version 2.
 #include <time.h>
 #include <vector>
 
+#ifndef USE_RDKIT
 // OpenBabel
 #include <openbabel/mol.h>
 #include <openbabel/obconversion.h>
+#else
+#include <GraphMol/FileParsers/MolSupplier.h>
+#include <GraphMol/FileParsers/MolWriters.h>
+#include <GraphMol/ROMol.h>
+#endif
 
 // Pharao
 #include <alignmentInfo.h>
@@ -107,6 +113,8 @@ int main(int argc, char *argv[]) {
   }
 
   // Create reference molecule
+  std::string refName;
+#ifndef USE_RDKIT
   OpenBabel::OBMol refMol;
   OpenBabel::OBConversion refInpReader;
   if (uo.format.empty()) {
@@ -115,8 +123,21 @@ int main(int argc, char *argv[]) {
     refInpReader.SetInFormat(refInpReader.FindFormat(uo.format));
   }
   refInpReader.Read(&refMol, uo.refInpStream);
-  std::string refName = "";
   refName = refMol.GetTitle();
+#else
+  bool takeOwnership = false;
+  bool sanitize = true;
+
+  bool removeHs = false;
+  RDKit::ForwardSDMolSupplier refsuppl(uo.refInpStream, takeOwnership, sanitize,
+                                       removeHs);
+  std::unique_ptr<RDKit::ROMol> refmptr(refsuppl.next());
+  if (!refmptr) {
+    mainErr("Could not parse reference molecule");
+  }
+  RDKit::ROMol &refMol = *refmptr;
+  refMol.getPropIfPresent("_Name", refName);
+#endif
   if (refName == "") {
     refName = "Unnamed_ref";
   }
@@ -134,6 +155,7 @@ int main(int argc, char *argv[]) {
   }
 
   // Write reference molecule to output
+#ifndef USE_RDKIT
   OpenBabel::OBConversion dbOutWriter;
   if (uo.format.empty()) {
     dbOutWriter.SetOutFormat(dbOutWriter.FormatFromExt(uo.molOutFile));
@@ -143,6 +165,10 @@ int main(int argc, char *argv[]) {
   if (uo.showRef && !uo.molOutFile.empty()) {
     dbOutWriter.Write(&refMol, uo.molOutStream);
   }
+#else
+  RDKit::SDWriter dbOutWriter(uo.molOutStream, false);
+  dbOutWriter.write(refMol);
+#endif
 
   // Create a class to hold the best solution of an iteration
   SolutionInfo bestSolution;
@@ -153,8 +179,9 @@ int main(int argc, char *argv[]) {
 
   // Open database stream
   unsigned molCount(0);
-  OpenBabel::OBMol dbMol;
   std::ostringstream ss;
+#ifndef USE_RDKIT
+  OpenBabel::OBMol dbMol;
   OpenBabel::OBConversion dbInpReader;
   if (uo.format.empty()) {
     dbInpReader.SetInFormat(dbInpReader.FormatFromExt(uo.dbInpFile));
@@ -164,6 +191,16 @@ int main(int argc, char *argv[]) {
   dbInpReader.SetInStream(uo.dbInpStream);
 
   while (dbInpReader.Read(&dbMol)) {
+#else
+  RDKit::ForwardSDMolSupplier dbsuppl(uo.dbInpStream, takeOwnership, sanitize,
+                                      removeHs);
+  while (!dbsuppl.atEnd()) {
+    std::unique_ptr<RDKit::ROMol> dbmptr(dbsuppl.next());
+    if (!dbmptr) {
+      continue;
+    }
+    RDKit::ROMol &dbMol = *dbmptr;
+#endif
     ++molCount;
 
     // Keep track of the number of molecules processed so far
@@ -174,12 +211,21 @@ int main(int argc, char *argv[]) {
       }
     }
 
-    std::string dbName = dbMol.GetTitle();
+    std::string dbName;
+#ifndef USE_RDKIT
+    dbName = dbMol.GetTitle();
+#else
+    dbMol.getPropIfPresent("_Name", dbName);
+#endif
     if (dbName == "") {
       ss.str("");
       ss << "MOL_" << molCount;
       dbName = ss.str();
+#ifndef USE_RDKIT
       dbMol.SetTitle(dbName);
+#else
+      dbMol.setProp("_Name", dbName);
+#endif
     }
     bestSolution.dbName = dbName;
 
@@ -248,7 +294,11 @@ int main(int argc, char *argv[]) {
     // Optimal alignment information is stored in res and bestScore
     // => result reporting and post-processing
     updateSolutionInfo(bestSolution, res, bestScore, dbVolume);
+#ifndef USE_RDKIT
     bestSolution.dbMol = dbMol;
+#else
+    bestSolution.dbMol = dbMol;
+#endif
     bestSolution.dbName = dbName;
 
     // At this point the information of the solution is stored in bestSolution
@@ -280,7 +330,11 @@ int main(int argc, char *argv[]) {
       if (uo.bestHits) {
         bestHits->add(bestSolution);
       } else if (!uo.molOutFile.empty()) {
+#ifndef USE_RDKIT
         dbOutWriter.Write(&(bestSolution.dbMol), uo.molOutStream);
+#else
+        dbOutWriter.write(bestSolution.dbMol);
+#endif
       }
     }
 
@@ -291,18 +345,23 @@ int main(int argc, char *argv[]) {
     // reset best solution
     bestSolution.score = 0.0;
 
+#ifndef USE_RDKIT
     // Clear current molecule
     dbMol.Clear();
+#endif
   }
 
   if (uo.bestHits) {
     if (!uo.molOutFile.empty()) {
       for (const auto molptr : bestHits->getBestList()) {
         if (molptr != nullptr) {
+#ifndef USE_RDKIT
           dbOutWriter.Write(&(molptr->dbMol), uo.molOutStream);
+#else
+          dbOutWriter.write(molptr->dbMol);
+#endif
         }
       }
-      // bestHits->writeMolecules(&uo, dbOutWriter);
       delete uo.molOutStream;
       uo.molOutStream = NULL;
     }

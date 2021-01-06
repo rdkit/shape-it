@@ -51,9 +51,17 @@ const double EPS = 0.03;
 const double GRADSCALE = 0.9;
 const double PENALTY = 5.00;
 
+#ifndef USE_RDKIT
 namespace OpenBabel {
 class OBMol;
 }
+using Molecule = OpenBabel::OBMol;
+#else
+namespace RDKit {
+class ROMol;
+}
+using Molecule = RDKit::ROMol;
+#endif
 
 class GaussianVolume {
 public:
@@ -74,7 +82,7 @@ public:
   ~GaussianVolume(void);
 };
 
-void listAtomVolumes(OpenBabel::OBMol &mol, GaussianVolume &gv);
+void listAtomVolumes(Molecule &mol, GaussianVolume &gv);
 void initOrientation(GaussianVolume &);
 double atomOverlap(GaussianVolume &, GaussianVolume &);
 double GAlpha(unsigned int);

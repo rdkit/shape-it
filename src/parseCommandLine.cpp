@@ -92,6 +92,11 @@ Options parseCommandLine(int argc, char *argv[]) {
 
     case 'f': //.....................................................format
       o.format = optarg;
+#ifdef USE_RDKIT
+      if (!o.format.empty() && o.format != "SDF") {
+        mainErr("RDKit implementation currently only supports SDF (-f)");
+      }
+#endif
       break;
 
     case 1: //....................................................scoreOnly

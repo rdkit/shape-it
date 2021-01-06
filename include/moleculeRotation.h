@@ -34,12 +34,19 @@ Shape-it is linked against OpenBabel version 2.
 // Shape-it
 #include <coordinate.h>
 #include <siMath.h>
+#ifndef USE_RDKIT
 namespace OpenBabel {
 class OBMol;
 }
-
-void positionMolecule(OpenBabel::OBMol &, Coordinate &, SiMath::Matrix &);
-void repositionMolecule(OpenBabel::OBMol &, SiMath::Matrix &, Coordinate &);
-void rotateMolecule(OpenBabel::OBMol &, SiMath::Vector &);
+using Molecule = OpenBabel::OBMol;
+#else
+namespace RDKit {
+class ROMol;
+}
+using Molecule = RDKit::ROMol;
+#endif
+void positionMolecule(Molecule &, Coordinate &, SiMath::Matrix &);
+void repositionMolecule(Molecule &, SiMath::Matrix &, Coordinate &);
+void rotateMolecule(Molecule &, SiMath::Vector &);
 
 #endif

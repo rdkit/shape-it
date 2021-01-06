@@ -16,7 +16,7 @@ file (APPEND ${PROJECT_SOURCE_DIR}/include/config.h "#define SHAPEIT_RELEASE ${V
 file (APPEND ${PROJECT_SOURCE_DIR}/include/config.h "#define SHAPEIT_SUBRELEASE ${VERSION_PATCH}\n")
 
 # Release type
-set (CMAKE_BUILD_TYPE Release)
+#set (CMAKE_BUILD_TYPE Release)
 
 # Source files
 file (GLOB_RECURSE sourcefiles "${PROJECT_SOURCE_DIR}/src/*.cpp")
@@ -32,7 +32,8 @@ if(NOT BUILD_RDKIT_SUPPORT)
 else(NOT BUILD_RDKIT_SUPPORT)
   add_definitions(-DUSE_RDKIT)
   find_package (RDKit REQUIRED)
-  include_directories (${RDKIT_INCLUDE_DIR})
+  find_package (Threads)
+  set(RDKit_THREAD_LIBS Threads::Threads)
 endif(NOT BUILD_RDKIT_SUPPORT)
 
 add_library (shapeit_lib SHARED src/alignmentInfo.cpp src/atomGaussian.cpp 
@@ -43,7 +44,7 @@ target_include_directories(shapeit_lib PUBLIC ${OPENBABEL3_INCLUDE_DIR} ${RDKIT_
 # Executables
 add_executable (${PROJECT_NAME} src/options.cpp src/main.cpp src/mainErr.cpp 
   src/printHeader.cpp src/printUsage.cpp src/options.cpp src/parseCommandLine.cpp)
-target_link_libraries (${PROJECT_NAME} shapeit_lib ${OPENBABEL3_LIBRARIES} ${RDKIT_LIBRARIES})
+target_link_libraries (${PROJECT_NAME} shapeit_lib ${OPENBABEL3_LIBRARIES} ${RDKIT_LIBRARIES} ${RDKit_THREAD_LIBS})
 install (TARGETS ${PROJECT_NAME} DESTINATION bin)
 message ("Installation directory of executable: ${CMAKE_INSTALL_PREFIX}/bin")
 
