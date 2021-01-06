@@ -47,7 +47,8 @@ Shape-it is linked against OpenBabel version 2.
 #include <options.h>
 #include <siMath.h>
 
-struct SolutionInfo {
+class SolutionInfo {
+public:
   std::string refName;
   double refAtomVolume;
   Coordinate refCenter;
@@ -74,7 +75,7 @@ struct SolutionInfo {
 };
 
 void setAllScores(SolutionInfo &);
-void updateSolutionInfo(SolutionInfo &, AlignmentInfo &, double,
-                        GaussianVolume &);
+void updateSolutionInfo(SolutionInfo &, const AlignmentInfo &, double,
+                        const GaussianVolume &);
 
 #endif

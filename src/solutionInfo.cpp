@@ -56,8 +56,8 @@ void SolutionInfo::printScores(Options &uo) {
   return;
 }
 
-void updateSolutionInfo(SolutionInfo &s, AlignmentInfo &res, double score,
-                        GaussianVolume &gv) {
+void updateSolutionInfo(SolutionInfo &s, const AlignmentInfo &res, double score,
+                        const GaussianVolume &gv) {
   s.dbAtomVolume = gv.overlap;
   s.dbCenter = gv.centroid;
   s.dbRotation = gv.rotation;

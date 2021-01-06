@@ -13,6 +13,7 @@ This file is part of Shape-it.
 
 class GaussianVolume;
 class SolutionInfo;
-SolutionInfo alignVolumes(GaussianVolume &refVolume, GaussianVolume &dbVolume,
+SolutionInfo alignVolumes(const GaussianVolume &refVolume,
+                          const GaussianVolume &dbVolume,
                           const std::string &whichScore, double maxIter);
 #endif

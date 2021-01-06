@@ -47,8 +47,8 @@ typedef std::map<unsigned int, double *>::iterator MatIter;
 
 class ShapeAlignment {
 private:
-  GaussianVolume *_gRef;
-  GaussianVolume *_gDb;
+  const GaussianVolume *_gRef;
+  const GaussianVolume *_gDb;
 
   unsigned int _rAtoms;
   unsigned int _rGauss;
@@ -59,10 +59,10 @@ private:
 
   MatrixMap _matrixMap;
 
-  double *_updateMatrixMap(AtomGaussian &, AtomGaussian &);
+  double *_updateMatrixMap(const AtomGaussian &, const AtomGaussian &);
 
 public:
-  ShapeAlignment(GaussianVolume &, GaussianVolume &);
+  ShapeAlignment(const GaussianVolume &, const GaussianVolume &);
   ~ShapeAlignment(void);
 
   AlignmentInfo gradientAscent(SiMath::Vector);

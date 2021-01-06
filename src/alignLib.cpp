@@ -12,7 +12,8 @@ This file is part of Shape-it.
 #include <gaussianVolume.h>
 #include <shapeAlignment.h>
 
-SolutionInfo alignVolumes(GaussianVolume &refVolume, GaussianVolume &dbVolume,
+SolutionInfo alignVolumes(const GaussianVolume &refVolume,
+                          const GaussianVolume &dbVolume,
                           const std::string &whichScore, double maxIter) {
   SolutionInfo res;
   res.refAtomVolume = refVolume.overlap;

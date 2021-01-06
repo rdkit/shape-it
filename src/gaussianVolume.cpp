@@ -118,11 +118,11 @@ double GAlpha(unsigned int an) {
 namespace {
 #ifndef USE_RDKIT
 
-unsigned int initFromMol(Molecule &mol, GaussianVolume &gv) {
+unsigned int initFromMol(const Molecule &mol, GaussianVolume &gv) {
   // Prepare the vector to store the atom and overlap volumes;
   unsigned int N = 0;
-  std::vector<OpenBabel::OBAtom *>::iterator ai;
-  for (OpenBabel::OBAtom *a = mol.BeginAtom(ai); a; a = mol.NextAtom(ai)) {
+  for (unsigned int i = 1; i <= mol.NumAtoms(); ++i) {
+    const OpenBabel::OBAtom *a = mol.GetAtom(i);
     if (a->GetAtomicNum() == 1) {
       continue;
     } else {
@@ -138,7 +138,8 @@ unsigned int initFromMol(Molecule &mol, GaussianVolume &gv) {
   gv.centroid.z = 0;
   int atomIndex = 0; // keeps track of the atoms processed so far
   int vecIndex = N;  // keeps track of the last element added to the vectors
-  for (OpenBabel::OBAtom *a = mol.BeginAtom(ai); a; a = mol.NextAtom(ai)) {
+  for (unsigned int i = 1; i <= mol.NumAtoms(); ++i) {
+    const OpenBabel::OBAtom *a = mol.GetAtom(i);
     // Skip hydrogens
     if (a->GetAtomicNum() == 1) {
       continue;
@@ -151,7 +152,6 @@ unsigned int initFromMol(Molecule &mol, GaussianVolume &gv) {
     gv.gaussians[atomIndex].center.z = a->GetZ();
     gv.gaussians[atomIndex].alpha = GAlpha(a->GetAtomicNum());
     gv.gaussians[atomIndex].C = GCI;
-    // double radius = et.GetVdwRad(a->GetAtomicNum());
     double radius = OpenBabel::OBElements::GetVdwRad(a->GetAtomicNum());
     gv.gaussians[atomIndex].volume =
         (4.0 * PI / 3.0) * radius * radius * radius;
@@ -160,7 +160,7 @@ unsigned int initFromMol(Molecule &mol, GaussianVolume &gv) {
   return N;
 }
 #else
-unsigned int initFromMol(Molecule &mol, GaussianVolume &gv) {
+unsigned int initFromMol(const Molecule &mol, GaussianVolume &gv) {
   // Prepare the vector to store the atom and overlap volumes;
   unsigned int N = 0;
   for (const auto a : mol.atoms()) {
@@ -206,7 +206,7 @@ unsigned int initFromMol(Molecule &mol, GaussianVolume &gv) {
 
 } // namespace
 
-void listAtomVolumes(Molecule &mol, GaussianVolume &gv) {
+void listAtomVolumes(const Molecule &mol, GaussianVolume &gv) {
   // Prepare the vector to store the atom and overlap volumes;
   unsigned int N = initFromMol(mol, gv);
 

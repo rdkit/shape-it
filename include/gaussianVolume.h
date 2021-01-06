@@ -82,7 +82,7 @@ public:
   ~GaussianVolume(void);
 };
 
-void listAtomVolumes(Molecule &mol, GaussianVolume &gv);
+void listAtomVolumes(const Molecule &mol, GaussianVolume &gv);
 void initOrientation(GaussianVolume &);
 double atomOverlap(const GaussianVolume &, const GaussianVolume &);
 double GAlpha(unsigned int);
