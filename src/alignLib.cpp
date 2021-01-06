@@ -6,11 +6,96 @@ Copyright 2021 by Greg Landrum
 This file is part of Shape-it.
 
 ***********************************************************************/
+#include <alignLib.h>
 
 #include <alignmentInfo.h>
 #include <bestResults.h>
 #include <gaussianVolume.h>
+#include <moleculeRotation.h>
 #include <shapeAlignment.h>
+
+SolutionInfo alignMols(const Molecule &refMol, const Molecule &dbMol,
+                       const std::string &whichScore, double maxIter,
+                       double cutoff, BestResults *bestHits) {
+  // Create the refence set of Gaussians
+  GaussianVolume refVolume;
+
+  // List all Gaussians and their respective intersections
+  listAtomVolumes(refMol, refVolume);
+
+  // Move the Gaussian towards its center of geometry and align with principal
+  // axes
+  initOrientation(refVolume);
+
+  // Create the set of Gaussians of database molecule
+  GaussianVolume dbVolume;
+  listAtomVolumes(dbMol, dbVolume);
+  initOrientation(dbVolume);
+
+  // Overlap with reference
+  AlignmentInfo res;
+  double bestScore(0.0);
+
+  SolutionInfo bestSolution =
+      std::move(alignVolumes(refVolume, dbVolume, whichScore, maxIter));
+#ifndef USE_RDKIT
+  bestSolution.dbMol = dbMol;
+  bestSolution.refName = refMol.GetTitle();
+  bestSolution.dbName = dbMol.GetTitle();
+#else
+  bestSolution.dbMol = dbMol;
+  refMol.getProp("_Name", bestSolution.refName);
+  dbMol.getProp("_Name", bestSolution.dbName);
+#endif
+
+  // Cleanup local pointers to atom-gaussians
+  dbVolume.gaussians.clear();
+  dbVolume.levels.clear();
+  for (std::vector<std::vector<unsigned int> *>::iterator si =
+           dbVolume.childOverlaps.begin();
+       si != dbVolume.childOverlaps.end(); ++si) {
+    if (*si != NULL) {
+      delete *si;
+      *si = NULL;
+    }
+  }
+  dbVolume.childOverlaps.clear();
+  refVolume.gaussians.clear();
+  for (std::vector<std::vector<unsigned int> *>::iterator si =
+           refVolume.childOverlaps.begin();
+       si != refVolume.childOverlaps.end(); ++si) {
+    if (*si != NULL) {
+      delete *si;
+      *si = NULL;
+    }
+  }
+  refVolume.childOverlaps.clear();
+
+  if (bestSolution.score < cutoff) {
+    return bestSolution;
+  }
+
+  // Add the score properties
+  setAllScores(bestSolution);
+
+  // Translate and rotate the molecule towards its centroid and inertia
+  // axes
+  positionMolecule(bestSolution.dbMol, bestSolution.dbCenter,
+                   bestSolution.dbRotation);
+
+  // Rotate molecule with the optimal
+  rotateMolecule(bestSolution.dbMol, bestSolution.rotor);
+
+  // Rotate and translate the molecule with the inverse rotation and
+  // translation of the reference molecule
+  repositionMolecule(bestSolution.dbMol, refVolume.rotation,
+                     refVolume.centroid);
+
+  if (bestHits) {
+    bestHits->add(bestSolution);
+  }
+  return bestSolution;
+}
 
 SolutionInfo alignVolumes(const GaussianVolume &refVolume,
                           const GaussianVolume &dbVolume,

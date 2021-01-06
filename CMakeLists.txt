@@ -3,6 +3,12 @@ cmake_minimum_required (VERSION 3.6)
 # Project
 project (shape-it)
 
+IF(NOT CMAKE_BUILD_TYPE)
+  SET(CMAKE_BUILD_TYPE Release CACHE STRING
+      "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
+      FORCE)
+ENDIF(NOT CMAKE_BUILD_TYPE)
+
 option(BUILD_RDKIT_SUPPORT "build against the RDKit instead of OpenBabel" OFF )
 
 set (CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
@@ -48,8 +54,26 @@ target_link_libraries (${PROJECT_NAME} shapeit_lib ${OPENBABEL3_LIBRARIES} ${RDK
 install (TARGETS ${PROJECT_NAME} DESTINATION bin)
 message ("Installation directory of executable: ${CMAKE_INSTALL_PREFIX}/bin")
 
+if(BUILD_RDKIT_SUPPORT)
+Include(FetchContent)
+
+FetchContent_Declare(
+  Catch2
+  GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+  GIT_TAG        v2.13.1)
+
+FetchContent_MakeAvailable(Catch2)
+
+add_executable (basic_tests src/catch_main.cpp src/basic_tests.cpp)
+target_link_libraries(basic_tests PRIVATE shapeit_lib ${RDKIT_LIBRARIES} ${RDKit_THREAD_LIBS})
+target_link_libraries(basic_tests PRIVATE Catch2::Catch2)
+add_test(basic_tests ${EXECUTABLE_OUTPUT_PATH}/basic_tests)
+
+endif(BUILD_RDKIT_SUPPORT)
+
+
 # Testing
-#enable_testing()
+enable_testing()
 #include(${CMAKE_MODULE_PATH}/IncludeAllTests.cmake)
 
 # # Packaging
