@@ -1,7 +1,9 @@
-cmake_minimum_required (VERSION 3.6) 
+cmake_minimum_required (VERSION 3.14) 
 
 # Project
 project (shape-it)
+
+set(CMAKE_CXX_STANDARD 11)
 
 IF(NOT CMAKE_BUILD_TYPE)
   SET(CMAKE_BUILD_TYPE Release CACHE STRING
@@ -10,6 +12,12 @@ IF(NOT CMAKE_BUILD_TYPE)
 ENDIF(NOT CMAKE_BUILD_TYPE)
 
 option(BUILD_RDKIT_SUPPORT "build against the RDKit instead of OpenBabel" OFF )
+option(BUILD_PYTHON_SUPPORT "builds the Python wrappers (requires RDKit support)" OFF )
+
+if(BUILD_PYTHON_SUPPORT AND NOT BUILD_RDKIT_SUPPORT)
+  message("disabling BUILD_PYTHON_SUPPORT because BUILD_RDKIT_SUPPORT is not enabled")
+  set(BUILD_PYTHON_SUPPORT OFF)
+endif()
 
 set (CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
 
@@ -68,9 +76,11 @@ add_executable (basic_tests src/catch_main.cpp src/basic_tests.cpp)
 target_link_libraries(basic_tests PRIVATE shapeit_lib ${RDKIT_LIBRARIES} ${RDKit_THREAD_LIBS})
 target_link_libraries(basic_tests PRIVATE Catch2::Catch2)
 add_test(basic_tests ${EXECUTABLE_OUTPUT_PATH}/basic_tests)
-
 endif(BUILD_RDKIT_SUPPORT)
 
+if(BUILD_PYTHON_SUPPORT)
+  add_subdirectory(src/Wrap)
+endif(BUILD_PYTHON_SUPPORT)
 
 # Testing
 enable_testing()
