@@ -1,11 +1,13 @@
 # FindRDKit.cmake
 # Copyright (C) 2013-2017 NextMove Software
+# Extensive modifications by Greg Landrum
 # Try to find RDKit headers and libraries
 # Defines:
 #
 #  RDKIT_FOUND - system has RDKit
 #  RDKIT_INCLUDE_DIR - the RDKit include directory
 #  RDKIT_LIBRARIES - Link these to use RDKit
+#  RDKIT_DYN_LIBRARIES - Link these to use RDKit
 
 if(RDKIT_INCLUDE_DIR AND RDKIT_LIBRARIES)
   # in cache already or user-specified
@@ -149,6 +151,80 @@ else()
         set(RDKIT_LIBRARIES ${RDKIT_LIBRARIES} ${COORDGEN_LIB} ${MAEPARSER_LIB})
       endif()
       message(STATUS "Found RDKit libraries at ${RDKIT_LIBRARY_DIR}")
+    endif()
+  endif()
+
+  if(NOT RDKIT_DYN_LIBRARIES)
+    find_library(RDKIT_FILEPARSERS_DYNLIB
+      NAMES RDKitFileParsers
+      NO_DEFAULT_PATH
+      PATHS
+        ${RDKIT_DIR}/lib
+        $ENV{RDKIT_LIB_DIR}
+        $ENV{RDKIT_LIB_PATH}
+        $ENV{RDKIT_LIBRARIES}
+        $ENV{RDKIT_BASE}/lib
+        $ENV{RDBASE}/lib
+        /usr/local/rdkit/lib
+        ~/rdkit/lib
+        $ENV{LD_LIBRARY_PATH}
+    )
+    find_library(RDKIT_FILEPARSERS_DYNLIB # repeat but use the default path
+      NAMES  RDKitFileParsers
+    )
+    if(RDKIT_FILEPARSERS_DYNLIB)
+      GET_FILENAME_COMPONENT(RDKIT_DYN_LIBRARY_DIR ${RDKIT_FILEPARSERS_DYNLIB} PATH)
+
+      find_library(SMILESPARSE_DYNLIB NAMES 
+                                         RDKitSmilesParse
+                                   HINTS ${RDKIT_DYN_LIBRARY_DIR} NO_DEFAULT_PATH)
+      find_library(DEPICTOR_DYNLIB NAMES 
+                                      RDKitDepictor
+                                HINTS ${RDKIT_DYN_LIBRARY_DIR} NO_DEFAULT_PATH)
+      find_library(SUBSTRUCTMATCH_DYNLIB NAMES 
+                                            RDKitSubstructMatch
+                                HINTS ${RDKIT_DYN_LIBRARY_DIR} NO_DEFAULT_PATH)
+      find_library(RINGDECOMPOSER_DYNLIB NAMES 
+                                      RDKitRingDecomposerLib
+                                HINTS ${RDKIT_DYN_LIBRARY_DIR} NO_DEFAULT_PATH)
+      if(NOT RINGDECOMPOSER_DYNLIB)
+         set(RINGDECOMPOSER_DYNLIB "")
+      endif()
+      find_library(GRAPHMOL_DYNLIB NAMES 
+                                      RDKitGraphMol
+                                HINTS ${RDKIT_DYN_LIBRARY_DIR} NO_DEFAULT_PATH)
+      find_library(RDGEOMETRYLIB_DYNLIB NAMES
+                                           RDKitRDGeometryLib
+                                     HINTS ${RDKIT_DYN_LIBRARY_DIR} NO_DEFAULT_PATH)
+      find_library(RDGENERAL_DYNLIB NAMES 
+                                       RDKitRDGeneral
+                                 HINTS ${RDKIT_DYN_LIBRARY_DIR} NO_DEFAULT_PATH)
+      find_library(COORDGEN_DYNLIB NAMES 
+                                      RDKitcoordgen
+                                      coordgenlib
+                                      coordgen
+                                 HINTS ${RDKIT_DYN_LIBRARY_DIR} NO_DEFAULT_PATH)
+      find_library(MAEPARSER_DYNLIB NAMES 
+                                       RDKitmaeparser
+                                       maeparser
+                                 HINTS ${RDKIT_DYN_LIBRARY_DIR} NO_DEFAULT_PATH)
+      find_library(RDDATASTRUCTS_DYNLIB NAMES 
+                                           RDKitDataStructs
+                                 HINTS ${RDKIT_DYN_LIBRARY_DIR} NO_DEFAULT_PATH)
+      find_library(RDMOLTRANSFORMS_DYNLIB NAMES 
+                                           RDKitMolTransforms
+                                 HINTS ${RDKIT_DYN_LIBRARY_DIR} NO_DEFAULT_PATH)
+      find_library(RDEIGENSOLVERS_DYNLIB NAMES 
+                                           RDKitEigenSolvers
+                                 HINTS ${RDKIT_DYN_LIBRARY_DIR} NO_DEFAULT_PATH)
+      set (RDKIT_DYN_LIBRARIES ${RDKIT_FILEPARSERS_DYNLIB} ${SMILESPARSE_DYNLIB}
+        ${DEPICTOR_DYNLIB} ${RDMOLTRANSFORMS_DYNLIB} ${RDEIGENSOLVERS_DYNLIB} ${SUBSTRUCTMATCH_DYNLIB}  
+        ${GRAPHMOL_DYNLIB} ${RINGDECOMPOSER_DYNLIB}
+        ${RDDATASTRUCTS_DYNLIB} ${RDGEOMETRYLIB_DYNLIB} ${RDGENERAL_DYNLIB})
+      if(COORDGEN_DYNLIB AND MAEPARSER_DYNLIB)
+        set(RDKIT_DYN_LIBRARIES ${RDKIT_DYN_LIBRARIES} ${COORDGEN_DYNLIB} ${MAEPARSER_DYNLIB})
+      endif()
+      message(STATUS "Found RDKit dynamic libraries at ${RDKIT_DYN_LIBRARY_DIR}")
     endif()
   endif()
 
