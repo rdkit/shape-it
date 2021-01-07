@@ -103,7 +103,8 @@ M  END''')
  12 19  1  0  0  0
 M  CHG  1  13  -1
 M  END''')
-        score = cpyshapeit.AlignMol(ref, probe)
+        tmp = Chem.Mol(probe)
+        score = cpyshapeit.AlignMol(ref, tmp)
         self.assertAlmostEqual(score, 0.647, 3)
         expected = Chem.MolFromMolBlock('''3hof_lig_DHC
      RDKit          3D
@@ -138,5 +139,19 @@ M  END''')
 M  CHG  1  13  -1
 M  END
 ''')
-        sssd = rdMolAlign.AlignMol(probe, expected)
-        self.assertAlmostEqual(sssd, 0, 3)
+        ssd = 0.0
+        probeConf = probe.GetConformer()
+        expectedConf = expected.GetConformer()
+        for i in range(probeConf.GetNumAtoms()):
+            delt = probeConf.GetAtomPosition(i) - expectedConf.GetAtomPosition(
+                i)
+            ssd += delt.LengthSq()
+        self.assertGreater(ssd, 100)
+        ssd = 0.0
+        probeConf = tmp.GetConformer()
+        expectedConf = expected.GetConformer()
+        for i in range(probeConf.GetNumAtoms()):
+            delt = probeConf.GetAtomPosition(i) - expectedConf.GetAtomPosition(
+                i)
+            ssd += delt.LengthSq()
+        self.assertAlmostEqual(ssd, 0, 3)

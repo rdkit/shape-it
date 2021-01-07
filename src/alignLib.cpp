@@ -36,6 +36,15 @@ alignMols(const Molecule &refMol, const Molecule &dbMol,
 #else
   refMol.getProp("_Name", res.refName);
 #endif
+
+  // Cleanup local pointers to atom-gaussians
+  refVolume.gaussians.clear();
+  refVolume.levels.clear();
+  for (const auto ci : refVolume.childOverlaps) {
+    delete ci;
+  }
+  refVolume.childOverlaps.clear();
+
   return res;
 }
 
