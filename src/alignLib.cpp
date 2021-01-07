@@ -14,6 +14,8 @@ This file is part of Shape-it.
 #include <moleculeRotation.h>
 #include <shapeAlignment.h>
 
+namespace shapeit {
+
 SolutionInfo
 alignMols(const Molecule &refMol, const Molecule &dbMol,
           const std::string &whichScore, double maxIter, double cutoff,
@@ -148,3 +150,4 @@ SolutionInfo alignVolumes(const GaussianVolume &refVolume,
 
   return std::move(res);
 }
+} // namespace shapeit

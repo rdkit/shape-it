@@ -240,8 +240,8 @@ int main(int argc, char *argv[]) {
     } else {
       initOrientation(dbVolume);
 
-      bestSolution = std::move(
-          alignVolumes(refVolume, dbVolume, uo.whichScore, uo.maxIter));
+      bestSolution = std::move(shapeit::alignVolumes(
+          refVolume, dbVolume, uo.whichScore, uo.maxIter));
     }
 
 #ifndef USE_RDKIT

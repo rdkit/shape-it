@@ -110,19 +110,19 @@ M  END)CTAB";
   REQUIRE(refMol);
   std::unique_ptr<ROMol> prbMol{MolBlockToMol(probe, sanitize, removeHs)};
   SECTION("basics") {
-    auto solution = alignMols(*refMol, *prbMol);
+    auto solution = shapeit::alignMols(*refMol, *prbMol);
     CHECK(solution.score == Approx(0.647).margin(0.01));
   }
   SECTION("self") {
     ROMol m2(*refMol);
-    auto solution = alignMols(*refMol, m2);
+    auto solution = shapeit::alignMols(*refMol, m2);
     CHECK(solution.score == Approx(1.00).margin(0.01));
   }
   SECTION("align to volume") {
     GaussianVolume refVolume;
     listAtomVolumes(*refMol, refVolume);
     initOrientation(refVolume);
-    auto solution = alignMolToVolume(refVolume, *prbMol);
+    auto solution = shapeit::alignMolToVolume(refVolume, *prbMol);
 
     refVolume.gaussians.clear();
     for (std::vector<std::vector<unsigned int> *>::iterator si =

@@ -23,6 +23,7 @@ using Molecule = OpenBabel::OBMol;
 using Molecule = RDKit::ROMol;
 #endif
 
+namespace shapeit {
 SolutionInfo alignMols(const Molecule &refMol, const Molecule &dbMol,
                        const std::string &whichScore = tanimoto,
                        double maxIter = 0, double cutoff = 0.0,
@@ -37,4 +38,5 @@ SolutionInfo alignMolToVolume(const GaussianVolume &refVolume,
 SolutionInfo alignVolumes(const GaussianVolume &refVolume,
                           const GaussianVolume &dbVolume,
                           const std::string &whichScore, double maxIter);
+} // namespace shapeit
 #endif
