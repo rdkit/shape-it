@@ -48,13 +48,18 @@ else(NOT BUILD_RDKIT_SUPPORT)
   find_package (RDKit REQUIRED)
   find_package (Threads)
   set(RDKit_THREAD_LIBS Threads::Threads)
+  find_package(Boost REQUIRED)
+#  include_directories(${Boost_INCLUDE_DIR})
 endif(NOT BUILD_RDKIT_SUPPORT)
 
 add_library (shapeit_lib SHARED src/alignLib.cpp src/alignmentInfo.cpp src/atomGaussian.cpp 
     src/bestResults.cpp src/coordinate.cpp
     src/gaussianVolume.cpp src/moleculeRotation.cpp src/shapeAlignment.cpp 
     src/siMath.cpp src/solutionInfo.cpp)
-target_include_directories(shapeit_lib PUBLIC ${OPENBABEL3_INCLUDE_DIR} ${RDKIT_INCLUDE_DIR})
+target_include_directories(shapeit_lib PUBLIC ${OPENBABEL3_INCLUDE_DIR} ${RDKIT_INCLUDE_DIR} ${Boost_INCLUDE_DIR}
+)
+target_link_libraries (shapeit_lib ${OPENBABEL3_LIBRARIES} ${RDKIT_LIBRARIES} ${RDKit_THREAD_LIBS})
+
 # Executables
 add_executable (${PROJECT_NAME} src/options.cpp src/main.cpp src/mainErr.cpp 
   src/printHeader.cpp src/printUsage.cpp src/options.cpp src/parseCommandLine.cpp)
