@@ -10,7 +10,6 @@ namespace python = boost::python;
 using namespace RDKit;
 
 namespace {
-std::string hello() { return "hello world"; }
 double alignMol(const ROMol &ref, ROMol &probe, const std::string &whichScore,
                 double maxIter, double cutoff) {
   auto sinfo = shapeit::alignMols(ref, probe, whichScore, maxIter, cutoff);
@@ -22,7 +21,6 @@ double alignMol(const ROMol &ref, ROMol &probe, const std::string &whichScore,
 } // namespace
 
 void wrap_pyshapeit() {
-  python::def("hello", &hello, "hello world");
   python::def("AlignMol", &alignMol,
               (python::arg("ref"), python::arg("probe"),
                python::arg("whichScore") = tanimoto,
