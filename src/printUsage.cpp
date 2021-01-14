@@ -1,8 +1,8 @@
 /*******************************************************************************
 printUsage.cpp - Shape-it
 
-Copyright 2012-2021 by Silicos-it, a division of Imacosi BVBA, and the Shape-it
-contributors
+Copyright 2012-2021 by Silicos-it, a division of Imacosi BVBA, Hans De Winter,
+and the Shape-it contributors
 
 This file is part of Shape-it.
 
