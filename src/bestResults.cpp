@@ -40,7 +40,7 @@ BestResults::BestResults(unsigned int n) {
   _filled = 0;
 }
 
-BestResults::~BestResults(void) {
+BestResults::~BestResults() {
   std::vector<SolutionInfo *>::iterator it;
   for (it = _bestList.begin(); it != _bestList.end(); ++it) {
     if (*it != NULL) {
@@ -53,7 +53,7 @@ BestResults::~BestResults(void) {
 bool BestResults::add(SolutionInfo &res) {
   std::vector<SolutionInfo *>::reverse_iterator it;
   if (_filled < _size) {
-    SolutionInfo *i = new SolutionInfo(res);
+    auto *i = new SolutionInfo(res);
     _bestList.push_back(i);
     ++_filled;
   } else if (res.score < _lowest) {
@@ -99,7 +99,7 @@ BestResults::writeMolecules(Options* uo)
 #endif
 
 void BestResults::writeScores(Options *uo) {
-  if (uo->scoreOutStream == NULL) {
+  if (uo->scoreOutStream == nullptr) {
     return;
   }
 

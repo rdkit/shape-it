@@ -47,8 +47,8 @@ Shape-it can be linked against either OpenBabel version 3 or the RDKit.
 #include <gaussianVolume.h>
 #include <siMath.h>
 
-typedef std::map<unsigned int, double *> MatrixMap;
-typedef std::map<unsigned int, double *>::iterator MatIter;
+using MatrixMap = std::map<unsigned int, double *>;
+using MatIter = std::map<unsigned int, double *>::iterator;
 
 class ShapeAlignment {
 private:
@@ -68,7 +68,7 @@ private:
 
 public:
   ShapeAlignment(const GaussianVolume &, const GaussianVolume &);
-  ~ShapeAlignment(void);
+  ~ShapeAlignment();
 
   AlignmentInfo gradientAscent(SiMath::Vector);
   AlignmentInfo simulatedAnnealing(SiMath::Vector);

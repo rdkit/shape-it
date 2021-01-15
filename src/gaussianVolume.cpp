@@ -46,11 +46,11 @@ Shape-it can be linked against either OpenBabel version 3 or the RDKit.
 
 // OpenBabel
 
-GaussianVolume::GaussianVolume(void)
+GaussianVolume::GaussianVolume()
     : volume(0.0), overlap(0.0), centroid(0.0, 0.0, 0.0), rotation(3, 3, 0.0),
       gaussians(), childOverlaps(), levels() {}
 
-GaussianVolume::~GaussianVolume(void) {}
+GaussianVolume::~GaussianVolume() = default;
 
 double GAlpha(unsigned int an) {
   switch (an) {
@@ -227,7 +227,7 @@ void listAtomVolumes(const Molecule &mol, GaussianVolume &gv) {
   int vecIndex = N; // keeps track of the last element added to the vectors
   for (unsigned int atomIndex = 0; atomIndex < N; ++atomIndex) {
     // Add empty child overlaps
-    std::vector<unsigned int> *vec = new std::vector<unsigned int>();
+    auto *vec = new std::vector<unsigned int>();
     gv.childOverlaps[atomIndex] = vec;
 
     // Update volume and centroid
@@ -240,7 +240,7 @@ void listAtomVolumes(const Molecule &mol, GaussianVolume &gv) {
         gv.gaussians[atomIndex].volume * gv.gaussians[atomIndex].center.z;
 
     // Add new empty set of possible overlaps
-    std::set<unsigned int> *tmp = new std::set<unsigned int>();
+    auto *tmp = new std::set<unsigned int>();
     overlaps[atomIndex] = tmp;
 
     // Loop over the current list of processed atoms and add overlaps
@@ -258,12 +258,12 @@ void listAtomVolumes(const Molecule &mol, GaussianVolume &gv) {
 
       // Add gaussian volume, and empty overlap set
       gv.gaussians.push_back(ga);
-      std::vector<unsigned int> *vec = new std::vector<unsigned int>();
+      auto *vec = new std::vector<unsigned int>();
       gv.childOverlaps.push_back(vec);
 
       // Update local variables of parents and possible overlaps
-      parents.push_back(std::make_pair(i, atomIndex));
-      std::set<unsigned int> *dummy = new std::set<unsigned int>();
+      parents.emplace_back(i, atomIndex);
+      auto *dummy = new std::set<unsigned int>();
       overlaps.push_back(dummy);
 
       // Update volume and centroid (negative contribution of atom-atom overlap)
@@ -332,12 +332,12 @@ void listAtomVolumes(const Molecule &mol, GaussianVolume &gv) {
         }
 
         gv.gaussians.push_back(ga);
-        std::vector<unsigned int> *vec = new std::vector<unsigned int>();
+        auto *vec = new std::vector<unsigned int>();
         gv.childOverlaps.push_back(vec);
 
         // Update local variables
-        parents.push_back(std::make_pair(i, *setIter));
-        std::set<unsigned int> *tmp = new std::set<unsigned int>();
+        parents.emplace_back(i, *setIter);
+        auto *tmp = new std::set<unsigned int>();
         overlaps.push_back(tmp);
 
         // Update volume, centroid and moments
@@ -374,12 +374,9 @@ void listAtomVolumes(const Molecule &mol, GaussianVolume &gv) {
   }
 
   // cleanup current set of computed overlaps
-  for (std::vector<std::set<unsigned int> *>::iterator si = overlaps.begin();
-       si != overlaps.end(); ++si) {
-    if (*si != NULL) {
-      delete *si;
-      *si = NULL;
-    }
+  for (auto &overlap : overlaps) {
+    delete overlap;
+    overlap = nullptr;
   }
 
   parents.clear();
@@ -402,33 +399,32 @@ void initOrientation(GaussianVolume &gv) {
   SiMath::Matrix mass(3, 3, 0.0);
 
   // Loop over all gaussians
-  for (std::vector<AtomGaussian>::iterator i = gv.gaussians.begin();
-       i != gv.gaussians.end(); ++i) {
+  for (auto &g : gv.gaussians) {
     // Translate to center
-    i->center.x -= gv.centroid.x;
-    i->center.y -= gv.centroid.y;
-    i->center.z -= gv.centroid.z;
+    g.center.x -= gv.centroid.x;
+    g.center.y -= gv.centroid.y;
+    g.center.z -= gv.centroid.z;
 
-    x = i->center.x;
-    y = i->center.y;
-    z = i->center.z;
+    x = g.center.x;
+    y = g.center.y;
+    z = g.center.z;
 
-    if ((i->nbr % 2) == 0) {
+    if ((g.nbr % 2) == 0) {
       // Update upper triangle
-      mass[0][0] -= i->volume * x * x;
-      mass[0][1] -= i->volume * x * y;
-      mass[0][2] -= i->volume * x * z;
-      mass[1][1] -= i->volume * y * y;
-      mass[1][2] -= i->volume * y * z;
-      mass[2][2] -= i->volume * z * z;
+      mass[0][0] -= g.volume * x * x;
+      mass[0][1] -= g.volume * x * y;
+      mass[0][2] -= g.volume * x * z;
+      mass[1][1] -= g.volume * y * y;
+      mass[1][2] -= g.volume * y * z;
+      mass[2][2] -= g.volume * z * z;
     } else {
       // Update upper triangle
-      mass[0][0] += i->volume * x * x;
-      mass[0][1] += i->volume * x * y;
-      mass[0][2] += i->volume * x * z;
-      mass[1][1] += i->volume * y * y;
-      mass[1][2] += i->volume * y * z;
-      mass[2][2] += i->volume * z * z;
+      mass[0][0] += g.volume * x * x;
+      mass[0][1] += g.volume * x * y;
+      mass[0][2] += g.volume * x * z;
+      mass[1][1] += g.volume * y * y;
+      mass[1][2] += g.volume * y * z;
+      mass[2][2] += g.volume * z * z;
     }
   }
 
@@ -460,16 +456,15 @@ void initOrientation(GaussianVolume &gv) {
   }
 
   // Rotate all gaussians
-  for (std::vector<AtomGaussian>::iterator i = gv.gaussians.begin();
-       i != gv.gaussians.end(); ++i) {
-    x = i->center.x;
-    y = i->center.y;
-    z = i->center.z;
-    i->center.x =
+  for (auto &g : gv.gaussians) {
+    x = g.center.x;
+    y = g.center.y;
+    z = g.center.z;
+    g.center.x =
         gv.rotation[0][0] * x + gv.rotation[1][0] * y + gv.rotation[2][0] * z;
-    i->center.y =
+    g.center.y =
         gv.rotation[0][1] * x + gv.rotation[1][1] * y + gv.rotation[2][1] * z;
-    i->center.z =
+    g.center.z =
         gv.rotation[0][2] * x + gv.rotation[1][2] * y + gv.rotation[2][2] * z;
   }
 
@@ -489,7 +484,7 @@ double atomOverlap(const GaussianVolume &gRef, const GaussianVolume &gDb) {
 
   double dx(0.0), dy(0.0), dz(0.0);
 
-  std::vector<unsigned int> *d1(NULL), *d2(NULL);
+  std::vector<unsigned int> *d1(nullptr), *d2(nullptr);
   std::vector<unsigned int>::iterator it1;
 
   // Overlap volume
@@ -529,13 +524,13 @@ double atomOverlap(const GaussianVolume &gRef, const GaussianVolume &gDb) {
       d2 = gDb.childOverlaps[j];
 
       // First add (i,child(j))
-      if (d2 != NULL) {
+      if (d2 != nullptr) {
         for (it1 = d2->begin(); it1 != d2->end(); ++it1) {
           processQueue.push(std::make_pair(i, *it1));
         }
       }
       // Second add (child(i,j))
-      if (d1 != NULL) {
+      if (d1 != nullptr) {
         for (it1 = d1->begin(); it1 != d1->end(); ++it1) {
           // add (child(i),j)
           processQueue.push(std::make_pair(*it1, j));
@@ -586,19 +581,19 @@ double atomOverlap(const GaussianVolume &gRef, const GaussianVolume &gDb) {
     // Loop over child nodes and add to queue
     d1 = gRef.childOverlaps[i];
     d2 = gDb.childOverlaps[j];
-    if (d1 != NULL && gRef.gaussians[i].nbr > gDb.gaussians[j].nbr) {
+    if (d1 != nullptr && gRef.gaussians[i].nbr > gDb.gaussians[j].nbr) {
       for (it1 = d1->begin(); it1 != d1->end(); ++it1) {
         // Add (child(i),j)
         processQueue.push(std::make_pair(*it1, j));
       }
     } else {
       // First add (i,child(j))
-      if (d2 != NULL) {
+      if (d2 != nullptr) {
         for (it1 = d2->begin(); it1 != d2->end(); ++it1) {
           processQueue.push(std::make_pair(i, *it1));
         }
       }
-      if (d1 != NULL && gDb.gaussians[j].nbr - gRef.gaussians[i].nbr < 2) {
+      if (d1 != nullptr && gDb.gaussians[j].nbr - gRef.gaussians[i].nbr < 2) {
         for (it1 = d1->begin(); it1 != d1->end(); ++it1) {
           // add (child(i),j)
           processQueue.push(std::make_pair(*it1, j));

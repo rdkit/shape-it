@@ -278,9 +278,9 @@ void Vector::swap(const unsigned int i, const unsigned int j) {
 }
 
 Matrix::Matrix(const unsigned int n, const unsigned int m)
-    : _nRows(n), _nCols(m), _pMatrix(0) {
+    : _nRows(n), _nCols(m), _pMatrix(nullptr) {
   if (n && m) {
-    double *dummy = new double[n * m]; // data
+    auto *dummy = new double[n * m]; // data
     _pMatrix = new double *[n];        // row pointers
     for (unsigned int i = 0; i < n; ++i) {
       _pMatrix[i] = dummy;
@@ -290,9 +290,9 @@ Matrix::Matrix(const unsigned int n, const unsigned int m)
 }
 
 Matrix::Matrix(const unsigned int n, const unsigned int m, const double &v)
-    : _nRows(n), _nCols(m), _pMatrix(0) {
+    : _nRows(n), _nCols(m), _pMatrix(nullptr) {
   if (n && m) {
-    double *dummy = new double[n * m];
+    auto *dummy = new double[n * m];
     _pMatrix = new double *[n];
     for (unsigned int i = 0; i < n; ++i) {
       _pMatrix[i] = dummy;
@@ -305,8 +305,8 @@ Matrix::Matrix(const unsigned int n, const unsigned int m, const double &v)
 }
 
 Matrix::Matrix(const unsigned int n, const unsigned int m, const Vector &vec)
-    : _nRows(n), _nCols(m), _pMatrix(0) {
-  double *dummy(new double[n * m]);
+    : _nRows(n), _nCols(m), _pMatrix(nullptr) {
+  auto *dummy(new double[n * m]);
   _pMatrix = new double *[n];
   for (unsigned int i = 0; i < n; ++i) {
     _pMatrix[i] = dummy;
@@ -320,9 +320,9 @@ Matrix::Matrix(const unsigned int n, const unsigned int m, const Vector &vec)
 }
 
 Matrix::Matrix(const Matrix &src)
-    : _nRows(src._nRows), _nCols(src._nCols), _pMatrix(0) {
+    : _nRows(src._nRows), _nCols(src._nCols), _pMatrix(nullptr) {
   if (_nRows && _nCols) {
-    double *dummy(new double[_nRows * _nCols]);
+    auto *dummy(new double[_nRows * _nCols]);
     _pMatrix = new double *[_nRows];
     for (unsigned int i = 0; i < _nRows; ++i) {
       _pMatrix[i] = dummy;
@@ -335,12 +335,12 @@ Matrix::Matrix(const Matrix &src)
 }
 
 Matrix::~Matrix() {
-  if (_pMatrix != NULL) {
-    if (_pMatrix[0] != NULL)
+  if (_pMatrix != nullptr) {
+    if (_pMatrix[0] != nullptr)
       delete[](_pMatrix[0]);
     delete[](_pMatrix);
   }
-  _pMatrix = NULL;
+  _pMatrix = nullptr;
 }
 
 double Matrix::getValueAt(const unsigned int i, const unsigned int j) {
@@ -385,13 +385,13 @@ void Matrix::setColumn(const unsigned int i, Vector &src) {
 Matrix &Matrix::operator=(const Matrix &M) {
   // check dimensions
   if (_nRows != M.nbrRows() || _nCols != M.nbrColumns()) {
-    if (_nRows && _pMatrix != 0) {
+    if (_nRows && _pMatrix != nullptr) {
       // delete old matrix
-      if (_nCols && _pMatrix[0] != NULL)
+      if (_nCols && _pMatrix[0] != nullptr)
         delete[] _pMatrix[0];
       delete[] _pMatrix;
     }
-    _pMatrix = NULL;
+    _pMatrix = nullptr;
     // create a new matrix
     _nRows = M.nbrRows();
     _nCols = M.nbrColumns();
@@ -535,9 +535,9 @@ void Matrix::swapColumns(unsigned int i, unsigned int j) {
 void Matrix::reset(const unsigned int r, const unsigned int c) {
   // check dimensions
   if (_nRows != r || _nCols != c) {
-    if (_nRows != 0 && _nCols != 0 && _pMatrix != 0) {
+    if (_nRows != 0 && _nCols != 0 && _pMatrix != nullptr) {
       // delete old matrix
-      if (_pMatrix[0] != NULL)
+      if (_pMatrix[0] != nullptr)
         delete[] _pMatrix[0];
       delete[] _pMatrix;
     }
@@ -545,7 +545,7 @@ void Matrix::reset(const unsigned int r, const unsigned int c) {
     _nRows = r;
     _nCols = c;
     if (_nRows == 0 || _nCols == 0) {
-      _pMatrix = NULL;
+      _pMatrix = nullptr;
       return;
     }
     _pMatrix = new double *[_nRows];
@@ -561,17 +561,17 @@ void Matrix::reset(const unsigned int r, const unsigned int c) {
 
 void Matrix::clear() {
   // delete old matrix
-  if (_pMatrix != NULL) {
-    if (_pMatrix[0] != NULL)
+  if (_pMatrix != nullptr) {
+    if (_pMatrix[0] != nullptr)
       delete[] _pMatrix[0];
     delete[] _pMatrix;
   }
-  _pMatrix = NULL;
+  _pMatrix = nullptr;
   _nRows = 0;
   _nCols = 0;
 }
 
-Matrix Matrix::transpose(void) {
+Matrix Matrix::transpose() {
   Matrix T(_nCols, _nRows);
   for (unsigned int i(0); i < _nRows; ++i) {
     for (unsigned int j(0); j < _nCols; ++j) {

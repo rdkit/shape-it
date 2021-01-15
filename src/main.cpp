@@ -32,10 +32,10 @@ Shape-it can be linked against either OpenBabel version 3 or the RDKit.
 ***********************************************************************/
 
 // General
+#include <cstdlib>
+#include <ctime>
 #include <fstream>
 #include <iostream>
-#include <stdlib.h>
-#include <time.h>
 #include <vector>
 
 #ifndef USE_RDKIT
@@ -68,7 +68,7 @@ Shape-it can be linked against either OpenBabel version 3 or the RDKit.
 //*--------------------------------------------------------------------------*//
 int main(int argc, char *argv[]) {
   // Initialise random number generator
-  srandom(time(NULL));
+  srandom(time(nullptr));
   clock_t t0 = clock();
 
   // Print header
@@ -100,7 +100,7 @@ int main(int argc, char *argv[]) {
   }
 
   // Create a list to store the best results
-  BestResults *bestHits = NULL;
+  BestResults *bestHits = nullptr;
   if (uo.bestHits != 0) {
     bestHits = new BestResults(uo.bestHits);
   }
@@ -260,13 +260,9 @@ int main(int argc, char *argv[]) {
     // Cleanup local pointers to atom-gaussians
     dbVolume.gaussians.clear();
     dbVolume.levels.clear();
-    for (std::vector<std::vector<unsigned int> *>::iterator si =
-             dbVolume.childOverlaps.begin();
-         si != dbVolume.childOverlaps.end(); ++si) {
-      if (*si != NULL) {
-        delete *si;
-        *si = NULL;
-      }
+    for (auto &childOverlap : dbVolume.childOverlaps) {
+      delete childOverlap;
+      childOverlap = nullptr;
     }
     dbVolume.childOverlaps.clear();
 
@@ -329,23 +325,23 @@ int main(int argc, char *argv[]) {
         }
       }
       delete uo.molOutStream;
-      uo.molOutStream = NULL;
+      uo.molOutStream = nullptr;
     }
     if (!uo.scoreOutFile.empty()) {
       bestHits->writeScores(&uo);
       delete uo.scoreOutStream;
-      uo.scoreOutStream = NULL;
+      uo.scoreOutStream = nullptr;
     }
   }
 
   // Clear current streams
-  if (uo.dbInpStream != NULL) {
+  if (uo.dbInpStream != nullptr) {
     delete uo.dbInpStream;
-    uo.dbInpStream = NULL;
+    uo.dbInpStream = nullptr;
   }
-  if (uo.refInpStream != NULL) {
+  if (uo.refInpStream != nullptr) {
     delete uo.refInpStream;
-    uo.refInpStream = NULL;
+    uo.refInpStream = nullptr;
   }
 
   // Done processing database
@@ -357,13 +353,9 @@ int main(int argc, char *argv[]) {
 
   // Cleanup local db volume
   refVolume.gaussians.clear();
-  for (std::vector<std::vector<unsigned int> *>::iterator si =
-           refVolume.childOverlaps.begin();
-       si != refVolume.childOverlaps.end(); ++si) {
-    if (*si != NULL) {
-      delete *si;
-      *si = NULL;
-    }
+  for (auto &childOverlap : refVolume.childOverlaps) {
+    delete childOverlap;
+    childOverlap = nullptr;
   }
 
   exit(0);

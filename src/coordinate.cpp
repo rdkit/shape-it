@@ -33,7 +33,7 @@ Shape-it can be linked against either OpenBabel version 3 or the RDKit.
 
 #include <coordinate.h>
 
-Coordinate::Coordinate(void) : x(0.0), y(0.0), z(0.0) {}
+Coordinate::Coordinate() : x(0.0), y(0.0), z(0.0) {}
 
 Coordinate::Coordinate(double x, double y, double z) : x(x), y(y), z(z){};
 

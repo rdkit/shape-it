@@ -148,13 +148,9 @@ M  END)CTAB";
     auto solution = shapeit::alignMolToVolume(refVolume, *prbMol);
 
     refVolume.gaussians.clear();
-    for (std::vector<std::vector<unsigned int> *>::iterator si =
-             refVolume.childOverlaps.begin();
-         si != refVolume.childOverlaps.end(); ++si) {
-      if (*si != NULL) {
-        delete *si;
-        *si = NULL;
-      }
+    for (auto &childOverlap : refVolume.childOverlaps) {
+      delete childOverlap;
+      childOverlap = nullptr;
     }
     refVolume.childOverlaps.clear();
   }

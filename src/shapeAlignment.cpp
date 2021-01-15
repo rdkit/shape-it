@@ -46,16 +46,14 @@ ShapeAlignment::ShapeAlignment(const GaussianVolume &gRef,
   _maxSize = _rGauss * _dGauss + 1;
 }
 
-ShapeAlignment::~ShapeAlignment(void) {
-  _gRef = NULL;
-  _gDb = NULL;
+ShapeAlignment::~ShapeAlignment() {
+  _gRef = nullptr;
+  _gDb = nullptr;
 
   // Clear the matrix map
-  for (MatIter mi = _matrixMap.begin(); mi != _matrixMap.end(); ++mi) {
-    if (mi->second != NULL) {
-      delete[] mi->second;
-      mi->second = NULL;
-    }
+  for (auto &mi : _matrixMap) {
+    delete[] mi.second;
+    mi.second = nullptr;
   }
 }
 
@@ -71,8 +69,8 @@ AlignmentInfo ShapeAlignment::gradientAscent(SiMath::Vector rotor) {
   double Vij(0.0);
   double qAq(0.0);
 
-  std::vector<unsigned int> *d1(NULL);
-  std::vector<unsigned int> *d2(NULL);
+  std::vector<unsigned int> *d1(nullptr);
+  std::vector<unsigned int> *d2(nullptr);
   std::vector<unsigned int>::iterator it1;
 
   // Gradient information
@@ -179,14 +177,14 @@ AlignmentInfo ShapeAlignment::gradientAscent(SiMath::Vector rotor) {
         d2 = _gDb->childOverlaps[j];
 
         // first add (i,child(j))
-        if (d2 != NULL) {
+        if (d2 != nullptr) {
           for (it1 = d2->begin(); it1 != d2->end(); ++it1) {
             processQueue.push(std::make_pair(i, *it1));
           }
         }
 
         // second add (child(i),j)
-        if (d1 != NULL) {
+        if (d1 != nullptr) {
           for (it1 = d1->begin(); it1 != d1->end(); ++it1) {
             processQueue.push(std::make_pair(*it1, j));
           }
@@ -261,19 +259,19 @@ AlignmentInfo ShapeAlignment::gradientAscent(SiMath::Vector rotor) {
       // loop over child nodes and add to queue
       d1 = _gRef->childOverlaps[i];
       d2 = _gDb->childOverlaps[j];
-      if (d1 != NULL && _gRef->gaussians[i].nbr > _gDb->gaussians[j].nbr) {
+      if (d1 != nullptr && _gRef->gaussians[i].nbr > _gDb->gaussians[j].nbr) {
         for (it1 = d1->begin(); it1 != d1->end(); ++it1) {
           // add (child(i),j)
           processQueue.push(std::make_pair(*it1, j));
         }
       } else {
         // first add (i,child(j))
-        if (d2 != NULL) {
+        if (d2 != nullptr) {
           for (it1 = d2->begin(); it1 != d2->end(); ++it1) {
             processQueue.push(std::make_pair(i, *it1));
           }
         }
-        if (d1 != NULL &&
+        if (d1 != nullptr &&
             _gDb->gaussians[j].nbr - _gRef->gaussians[i].nbr < 2) {
           for (it1 = d1->begin(); it1 != d1->end(); ++it1) {
             // add (child(i),j)
@@ -364,8 +362,8 @@ AlignmentInfo ShapeAlignment::simulatedAnnealing(SiMath::Vector rotor) {
 
   double Vij(0.0), qAq(0.0);
 
-  std::vector<unsigned int> *d1(NULL);
-  std::vector<unsigned int> *d2(NULL);
+  std::vector<unsigned int> *d1(nullptr);
+  std::vector<unsigned int> *d2(nullptr);
   std::vector<unsigned int>::iterator it1;
 
   // overlap volume
@@ -441,13 +439,13 @@ AlignmentInfo ShapeAlignment::simulatedAnnealing(SiMath::Vector rotor) {
         d2 = _gDb->childOverlaps[j];
 
         // first add (i,child(j))
-        if (d2 != NULL) {
+        if (d2 != nullptr) {
           for (it1 = d2->begin(); it1 != d2->end(); ++it1) {
             processQueue.push(std::make_pair(i, *it1));
           }
         }
         // second add (child(i),j)
-        if (d1 != NULL) {
+        if (d1 != nullptr) {
           for (it1 = d1->begin(); it1 != d1->end(); ++it1) {
             processQueue.push(std::make_pair(*it1, j));
           }
@@ -501,19 +499,19 @@ AlignmentInfo ShapeAlignment::simulatedAnnealing(SiMath::Vector rotor) {
       // loop over child nodes and add to queue
       d1 = _gRef->childOverlaps[i];
       d2 = _gDb->childOverlaps[j];
-      if (d1 != NULL && _gRef->gaussians[i].nbr > _gDb->gaussians[j].nbr) {
+      if (d1 != nullptr && _gRef->gaussians[i].nbr > _gDb->gaussians[j].nbr) {
         for (it1 = d1->begin(); it1 != d1->end(); ++it1) {
           // add (child(i),j)
           processQueue.push(std::make_pair(*it1, j));
         }
       } else {
         // first add (i,child(j))
-        if (d2 != NULL) {
+        if (d2 != nullptr) {
           for (it1 = d2->begin(); it1 != d2->end(); ++it1) {
             processQueue.push(std::make_pair(i, *it1));
           }
         }
-        if (d1 != NULL &&
+        if (d1 != nullptr &&
             _gDb->gaussians[j].nbr - _gRef->gaussians[i].nbr < 2) {
           for (it1 = d1->begin(); it1 != d1->end(); ++it1) {
             // add (child(i),j)
@@ -586,7 +584,7 @@ void ShapeAlignment::setMaxIterations(unsigned int i) {
 
 double *ShapeAlignment::_updateMatrixMap(const AtomGaussian &a,
                                          const AtomGaussian &b) {
-  double *A = new double[17];
+  auto *A = new double[17];
 
   // variables to store sum and difference of components
   double dx = (a.center.x - b.center.x);
