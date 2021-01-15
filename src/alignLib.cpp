@@ -98,13 +98,9 @@ SolutionInfo alignMolToVolume(const GaussianVolume &refVolume,
   // Cleanup local pointers to atom-gaussians
   dbVolume.gaussians.clear();
   dbVolume.levels.clear();
-  for (std::vector<std::vector<unsigned int> *>::iterator si =
-           dbVolume.childOverlaps.begin();
-       si != dbVolume.childOverlaps.end(); ++si) {
-    if (*si != NULL) {
-      delete *si;
-      *si = NULL;
-    }
+  for (auto &childOverlap : dbVolume.childOverlaps) {
+    delete childOverlap;
+    childOverlap = nullptr;
   }
   dbVolume.childOverlaps.clear();
 

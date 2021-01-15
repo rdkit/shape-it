@@ -38,14 +38,14 @@ Shape-it can be linked against either OpenBabel version 3 or the RDKit.
 #include <openbabel/generic.h>
 #endif
 
-SolutionInfo::SolutionInfo(void)
+SolutionInfo::SolutionInfo()
     : refName(""), refAtomVolume(0.0), refCenter(0, 0, 0), refRotation(3, 3, 0),
       dbName(""), dbAtomVolume(0.0), dbMol(), dbCenter(0, 0, 0),
       dbRotation(3, 3, 0), atomOverlap(0.0), score(0.0), rotor(4, 0.0) {
   rotor[0] = 1.0;
 }
 
-SolutionInfo::~SolutionInfo(void) {}
+SolutionInfo::~SolutionInfo() = default;
 
 void SolutionInfo::printScores(Options &uo) {
   *(uo.scoreOutStream)

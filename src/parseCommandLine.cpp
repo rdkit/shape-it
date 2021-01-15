@@ -35,19 +35,19 @@ Shape-it can be linked against either OpenBabel version 3 or the RDKit.
 
 Options parseCommandLine(int argc, char *argv[]) {
   static struct option Arguments[] = {
-      {"version", no_argument, NULL, 'v'},
-      {"reference", required_argument, NULL, 'r'},
-      {"dbase", required_argument, NULL, 'd'},
-      {"scores", required_argument, NULL, 's'},
-      {"out", required_argument, NULL, 'o'},
-      {"format", required_argument, NULL, 'f'},
-      {"scoreOnly", no_argument, NULL, 1},
-      {"rankBy", required_argument, NULL, 2},
-      {"best", required_argument, NULL, 4},
-      {"addIterations", required_argument, NULL, 5},
-      {"cutoff", required_argument, NULL, 6},
-      {"noRef", no_argument, NULL, 11},
-      {"help", no_argument, NULL, 'h'}};
+      {"version", no_argument, nullptr, 'v'},
+      {"reference", required_argument, nullptr, 'r'},
+      {"dbase", required_argument, nullptr, 'd'},
+      {"scores", required_argument, nullptr, 's'},
+      {"out", required_argument, nullptr, 'o'},
+      {"format", required_argument, nullptr, 'f'},
+      {"scoreOnly", no_argument, nullptr, 1},
+      {"rankBy", required_argument, nullptr, 2},
+      {"best", required_argument, nullptr, 4},
+      {"addIterations", required_argument, nullptr, 5},
+      {"cutoff", required_argument, nullptr, 6},
+      {"noRef", no_argument, nullptr, 11},
+      {"help", no_argument, nullptr, 'h'}};
 
   Options o;
 
@@ -121,15 +121,15 @@ Options parseCommandLine(int argc, char *argv[]) {
       break;
 
     case 4: //.........................................................best
-      o.bestHits = strtol(optarg, NULL, 10);
+      o.bestHits = strtol(optarg, nullptr, 10);
       break;
 
     case 5: //................................................addIterations
-      o.maxIter = strtol(optarg, NULL, 10);
+      o.maxIter = strtol(optarg, nullptr, 10);
       break;
 
     case 6: //.......................................................cutoff
-      o.cutOff = strtod(optarg, NULL);
+      o.cutOff = strtod(optarg, nullptr);
       if (o.cutOff > 1) {
         o.cutOff = 1.0;
       } else if (o.cutOff < 0) {

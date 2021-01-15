@@ -34,18 +34,18 @@ Shape-it can be linked against either OpenBabel version 3 or the RDKit.
 #include <options.h>
 #include <sstream>
 
-Options::Options(void) {
+Options::Options() {
   refInpFile = "";
-  refInpStream = NULL;
+  refInpStream = nullptr;
 
   dbInpFile = "";
-  dbInpStream = NULL;
+  dbInpStream = nullptr;
 
   molOutFile = "";
-  molOutStream = NULL;
+  molOutStream = nullptr;
 
   scoreOutFile = "";
-  scoreOutStream = NULL;
+  scoreOutStream = nullptr;
 
   bestHits = 0;
   cutOff = 0.0;
@@ -60,14 +60,14 @@ Options::Options(void) {
   help = false;
 }
 
-Options::~Options(void) {
+Options::~Options() {
   // reference input
   if (!refInpFile.empty()) {
     refInpFile = "";
   };
   if (refInpStream) {
     delete refInpStream;
-    refInpStream = NULL;
+    refInpStream = nullptr;
   };
 
   // Database input
@@ -76,7 +76,7 @@ Options::~Options(void) {
   };
   if (dbInpStream) {
     delete dbInpStream;
-    dbInpStream = NULL;
+    dbInpStream = nullptr;
   };
 
   // Molecule output
@@ -85,7 +85,7 @@ Options::~Options(void) {
   };
   if (molOutStream) {
     delete molOutStream;
-    molOutStream = NULL;
+    molOutStream = nullptr;
   };
 
   // Score output
@@ -94,11 +94,11 @@ Options::~Options(void) {
   };
   if (scoreOutStream) {
     delete scoreOutStream;
-    scoreOutStream = NULL;
+    scoreOutStream = nullptr;
   };
 }
 
-std::string Options::print(void) const {
+std::string Options::print() const {
   std::ostringstream os;
   os << std::endl;
   os << "COMMAND_LINE OPTIONS:" << std::endl;

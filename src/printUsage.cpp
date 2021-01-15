@@ -33,7 +33,7 @@ Shape-it can be linked against either OpenBabel version 3 or the RDKit.
 
 #include <printUsage.h>
 
-void printUsage(void) {
+void printUsage() {
   std::cerr << std::endl;
   std::cerr << "TASK:" << std::endl << std::endl;
   std::cerr << "  Shape-it is a tool to align pairs of molecules based on "

@@ -33,8 +33,8 @@ Shape-it can be linked against either OpenBabel version 3 or the RDKit.
 
 #include <alignmentInfo.h>
 
-AlignmentInfo::AlignmentInfo(void) : overlap(0.0), rotor(4, 0.0) {
+AlignmentInfo::AlignmentInfo() : overlap(0.0), rotor(4, 0.0) {
   rotor[0] = 1.0;
 }
 
-AlignmentInfo::~AlignmentInfo(void) {}
+AlignmentInfo::~AlignmentInfo() = default;

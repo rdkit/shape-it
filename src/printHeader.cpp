@@ -39,7 +39,7 @@ Shape-it can be linked against either OpenBabel version 3 or the RDKit.
 #include <RDGeneral/versions.h>
 #endif
 
-void printHeader(void) {
+void printHeader() {
   std::cerr << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
                "++++++++++++"
             << std::endl;

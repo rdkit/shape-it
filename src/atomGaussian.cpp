@@ -33,10 +33,10 @@ Shape-it can be linked against either OpenBabel version 3 or the RDKit.
 
 #include <atomGaussian.h>
 
-AtomGaussian::AtomGaussian(void)
+AtomGaussian::AtomGaussian()
     : center(0.0, 0.0, 0.0), alpha(0.0), volume(0.0), C(0.0), nbr(0) {}
 
-AtomGaussian::~AtomGaussian(void) {}
+AtomGaussian::~AtomGaussian() = default;
 
 AtomGaussian atomIntersection(AtomGaussian &a, AtomGaussian &b) {
   AtomGaussian c;
