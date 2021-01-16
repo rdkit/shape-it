@@ -3,12 +3,12 @@
 
 ## Description
 
-Code for shapeit-it with openbabel3
+Code for shape-it with openbabel3
 
 
 ## INSTALL
 
-- following example is basic way.
+- Following example is the basic way to install the tool.
 
 ```
 git clone https://github.com/iwatobipen/shape-it-ob3.git
@@ -21,7 +21,7 @@ make install
 ```
 
 
-- for If you would like to use rdkit for shape-it please set BUILD_RDKIT_SUPPORT=ON. Also set BUID_PYTON_SUPPORT to ON, you can call shape-it as a library.
+- If you would like to use rdkit for shape-it please set BUILD_RDKIT_SUPPORT=ON. Also set BUID_PYTON_SUPPORT to ON, you can call shape-it as a library.
 
 
 ```
@@ -33,7 +33,7 @@ make
 make install
 ```
 
-- TIPS
+## Tips
 - If make command failed, you shoud try to set RDKIT_INCLUDE_DIR, Boost_INCLUDE_DIR option.
 
 ```
@@ -47,4 +47,11 @@ make install
 ## Original code
 - http://silicos-it.be.s3-website-eu-west-1.amazonaws.com/software/shape-it/1.0.1/shape-it.html
 
+
+
+## History of Shape-it and how to cite
+
+Shape-it is a rewrite of the original Pharao code that was developed in 2008 by Silicos (Jonatan Taminau, Gert Thijs and Hans De Winter @hansdewinter). If you use this code in your research, we would appreciate if you would include the following citation in your publication:
+
+Taminau, J.; Thijs, G.; De Winter, H. (2008) ‘Pharao: Pharmacophore alignment and optimization’, J. Mol. Graph. Model. 27, 161-169
 
