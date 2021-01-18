@@ -59,6 +59,7 @@ add_library (shapeit_lib SHARED src/alignLib.cpp src/alignmentInfo.cpp src/atomG
 target_include_directories(shapeit_lib PUBLIC ${OPENBABEL3_INCLUDE_DIR} ${RDKIT_INCLUDE_DIR} ${Boost_INCLUDE_DIR}
 )
 target_link_libraries (shapeit_lib ${OPENBABEL3_LIBRARIES} ${RDKIT_LIBRARIES} ${RDKit_THREAD_LIBS})
+install (TARGETS shapeit_lib DESTINATION lib)
 
 # Executables
 add_executable (${PROJECT_NAME} src/options.cpp src/main.cpp src/mainErr.cpp 
@@ -84,7 +85,9 @@ add_test(basic_tests ${EXECUTABLE_OUTPUT_PATH}/basic_tests)
 endif(BUILD_RDKIT_SUPPORT)
 
 if(BUILD_PYTHON_SUPPORT)
+   find_package(Python3 COMPONENTS Interpreter REQUIRED)
   add_subdirectory(src/Wrap)
+  install(DIRECTORY pyshapeit DESTINATION ${PYTHON_INSTDIR})
 endif(BUILD_PYTHON_SUPPORT)
 
 # Testing
