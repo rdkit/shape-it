@@ -11,8 +11,8 @@ Code for shape-it with openbabel3
 - Following example is the basic way to install the tool:
 
 ```
-git clone https://github.com/iwatobipen/shape-it-ob3.git
-cd shape-it-ob3
+git clone https://github.com/rdkit/shape-it.git
+cd shape-it
 mkdir build
 cd build
 cmake -DCMAKE_INSTALL_PREFIX=<where you want to install> ..
