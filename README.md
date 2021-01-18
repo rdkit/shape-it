@@ -50,7 +50,7 @@ make install
 
 ## History of shape-it and how to cite
 
-Shape-it is a shape-only rewrite of the original Pharao code that was developed in 2008 by Silicos (Jonatan Taminau, [Gert Thijs](https://github.com/gertthijs) and [Hans De Winter](https://github.com/hansdewinter)). It is based on the alignment method described by Grant and Pickup (*J. Phys. Chem.* 1995, **99**, 3503).
+Shape-it is a shape-only rewrite of the original Pharao code that was developed in 2008 by Silicos (Jonatan Taminau, [Gert Thijs](https://github.com/gertthijs) and [Hans De Winter](https://github.com/hansdewinter)). It is based on the alignment method described by Grant and Pickup ([*J. Phys. Chem.* 1995, **99**, 3503](https://pubs.acs.org/doi/10.1021/j100011a016)).
 If you use this code in your research, we would appreciate if you would include the following citation in your publication:
 
 Taminau, J.; Thijs, G.; De Winter, H. (2008) ‘Pharao: Pharmacophore alignment and optimization’, *J. Mol. Graph. Model.* **27**, 161-169
