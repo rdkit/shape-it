@@ -1,4 +1,4 @@
-# shape-it-ob3
+# shape-it
 
 
 ## Description
@@ -37,7 +37,7 @@ make install
 - If the make command failed, you should try to set RDKIT_INCLUDE_DIR, Boost_INCLUDE_DIR option.
 
 ```
-cmake -DCMAKE_INSTALL_PREFIX=/home/iwatobipen/src/shape-it-ob3 -DRDKIT_INCLUDE_DIR=/home/iwatobipen/miniconda3/envs/chemoinfo/include/rdkit -DBUILD_RDKIT_SUPPORT=ON -DBUILD_PYTHON_SUPPORT=ON -DBoost_INCLUDE_DIR=/home/iwatobipen/miniconda3/envs/chemoinfo/pkgs/libboost-1.73.0-hf484d3e_11/include ..
+cmake -DCMAKE_INSTALL_PREFIX=/home/iwatobipen/src/shape-it -DRDKIT_INCLUDE_DIR=/home/iwatobipen/miniconda3/envs/chemoinfo/include/rdkit -DBUILD_RDKIT_SUPPORT=ON -DBUILD_PYTHON_SUPPORT=ON -DBoost_INCLUDE_DIR=/home/iwatobipen/miniconda3/envs/chemoinfo/pkgs/libboost-1.73.0-hf484d3e_11/include ..
 make
 make install
 ```
