@@ -3,7 +3,7 @@
 
 ## Description
 
-Code for shape-it with openbabel3
+Code for shape-it with openbabel3 and rdkit
 
 
 ## INSTALL
