@@ -21,7 +21,7 @@ make install
 ```
 
 
-- If you would like to use rdkit for shape-it please set BUILD_RDKIT_SUPPORT=ON. Also set BUILD_PYTON_SUPPORT=ON, you can call shape-it as a library:
+- If you would like to use rdkit for shape-it please set BUILD_RDKIT_SUPPORT=ON. Also set BUILD_PYTHON_SUPPORT=ON, you can call shape-it as a library:
 
 
 ```
@@ -54,4 +54,3 @@ Shape-it is a shape-only rewrite of the original Pharao code that was developed 
 If you use this code in your research, we would appreciate if you would include the following citation in your publication:
 
 Taminau, J.; Thijs, G.; De Winter, H. (2008) ‘Pharao: Pharmacophore alignment and optimization’, *J. Mol. Graph. Model.* **27**, 161-169
-
