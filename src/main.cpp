@@ -163,18 +163,22 @@ int main(int argc, char *argv[]) {
 
   // Write reference molecule to output
 #ifndef USE_RDKIT
-  OpenBabel::OBConversion dbOutWriter;
+  std::unique_ptr<OpenBabel::OBConversion> dbOutWriter(
+      new OpenBabel::OBConversion());
   if (uo.format.empty()) {
-    dbOutWriter.SetOutFormat(dbOutWriter.FormatFromExt(uo.molOutFile));
+    dbOutWriter->SetOutFormat(dbOutWriter->FormatFromExt(uo.molOutFile));
   } else {
-    dbOutWriter.SetOutFormat(dbOutWriter.FindFormat(uo.format));
+    dbOutWriter->SetOutFormat(dbOutWriter->FindFormat(uo.format));
   }
   if (uo.showRef && !uo.molOutFile.empty()) {
-    dbOutWriter.Write(&refMol, uo.molOutStream);
+    dbOutWriter->Write(&refMol, uo.molOutStream);
   }
 #else
-  RDKit::SDWriter dbOutWriter(uo.molOutStream, false);
-  dbOutWriter.write(refMol);
+  std::unique_ptr<RDKit::SDWriter> dbOutWriter;
+  if (uo.molOutStream != nullptr) {
+    dbOutWriter.reset(new RDKit::SDWriter(uo.molOutStream, false));
+    dbOutWriter->write(refMol);
+  }
 #endif
 
   // Open database stream
@@ -294,11 +298,11 @@ int main(int argc, char *argv[]) {
 
       if (uo.bestHits) {
         bestHits->add(bestSolution);
-      } else if (!uo.molOutFile.empty()) {
+      } else if (!uo.molOutFile.empty() && dbOutWriter != nullptr) {
 #ifndef USE_RDKIT
-        dbOutWriter.Write(&(bestSolution.dbMol), uo.molOutStream);
+        dbOutWriter->Write(&(bestSolution.dbMol), uo.molOutStream);
 #else
-        dbOutWriter.write(bestSolution.dbMol);
+        dbOutWriter->write(bestSolution.dbMol);
 #endif
       }
     }
@@ -316,11 +320,11 @@ int main(int argc, char *argv[]) {
   if (uo.bestHits) {
     if (!uo.molOutFile.empty()) {
       for (const auto molptr : bestHits->getBestList()) {
-        if (molptr != nullptr) {
+        if (molptr != nullptr && dbOutWriter != nullptr) {
 #ifndef USE_RDKIT
-          dbOutWriter.Write(&(molptr->dbMol), uo.molOutStream);
+          dbOutWriter->Write(&(molptr->dbMol), uo.molOutStream);
 #else
-          dbOutWriter.write(molptr->dbMol);
+          dbOutWriter->write(molptr->dbMol);
 #endif
         }
       }
