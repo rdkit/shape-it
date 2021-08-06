@@ -221,7 +221,6 @@ void listAtomVolumes(const Molecule &mol, GaussianVolume &gv) {
   // Create a vector to keep track of the overlaps
   // Overlaps are stored as sets
   std::vector<std::set<unsigned int> *> overlaps(N);
-  std::set<unsigned int>::iterator setIter;
 
   // Start by iterating over the single atoms and build map of overlaps
   int vecIndex = N; // keeps track of the last element added to the vectors
@@ -314,19 +313,18 @@ void listAtomVolumes(const Molecule &mol, GaussianVolume &gv) {
 
       // Get the possible overlaps from the parent gaussians
       // and create the new overlap volume
-      for (setIter = overlaps[i]->begin(); setIter != overlaps[i]->end();
-           ++setIter) {
-        if (*setIter <= a2) {
+      for (auto overlapIdx : *overlaps[i]) {
+        if (overlapIdx <= a2) {
           continue;
         }
 
         // Create a new overlap gaussian
         AtomGaussian ga =
-            atomIntersection(gv.gaussians[i], gv.gaussians[*setIter]);
+            atomIntersection(gv.gaussians[i], gv.gaussians[overlapIdx]);
 
         // Check if the volume is large enough
         if (ga.volume / (gv.gaussians[i].volume +
-                         gv.gaussians[*setIter].volume - ga.volume) <
+                         gv.gaussians[overlapIdx].volume - ga.volume) <
             EPS) {
           continue;
         }
@@ -336,7 +334,7 @@ void listAtomVolumes(const Molecule &mol, GaussianVolume &gv) {
         gv.childOverlaps.push_back(vec);
 
         // Update local variables
-        parents.emplace_back(i, *setIter);
+        parents.emplace_back(i, overlapIdx);
         auto *tmp = new std::set<unsigned int>();
         overlaps.push_back(tmp);
 
