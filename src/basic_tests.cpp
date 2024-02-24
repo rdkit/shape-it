@@ -25,7 +25,7 @@ Shape-it can be linked against either OpenBabel version 3 or the RDKit.
         the Free Software Foundation version 2 of the License.
 */
 
-#include "catch2/catch.hpp"
+#include "catch2/catch_all.hpp"
 
 #include <GraphMol/FileParsers/FileParsers.h>
 #include <GraphMol/RDKitBase.h>
@@ -134,12 +134,12 @@ M  END)CTAB";
   std::unique_ptr<ROMol> prbMol{MolBlockToMol(probe, sanitize, removeHs)};
   SECTION("basics") {
     auto solution = shapeit::alignMols(*refMol, *prbMol);
-    CHECK(solution.score == Approx(0.647).margin(0.01));
+    CHECK(solution.score == Catch::Approx(0.647).margin(0.01));
   }
   SECTION("self") {
     ROMol m2(*refMol);
     auto solution = shapeit::alignMols(*refMol, m2);
-    CHECK(solution.score == Approx(1.00).margin(0.01));
+    CHECK(solution.score == Catch::Approx(1.00).margin(0.01));
   }
   SECTION("align to volume") {
     GaussianVolume refVolume;

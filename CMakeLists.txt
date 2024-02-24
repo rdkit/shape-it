@@ -2,8 +2,8 @@ cmake_minimum_required (VERSION 3.14)
 
 # Project
 project (shape-it)
+set(CMAKE_CXX_STANDARD 17)
 
-set(CMAKE_CXX_STANDARD 14)
 
 IF(NOT CMAKE_BUILD_TYPE)
   SET(CMAKE_BUILD_TYPE Release CACHE STRING
@@ -20,6 +20,14 @@ if(BUILD_PYTHON_SUPPORT AND NOT BUILD_RDKIT_SUPPORT)
 endif()
 
 set (CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
+
+set(CMAKE_SKIP_BUILD_RPATH  FALSE)
+set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
+if("${isSystemDir}" STREQUAL "-1")
+   set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+endif()
 
 # Version
 set (VERSION_MAJOR 2)
@@ -74,13 +82,13 @@ Include(FetchContent)
 FetchContent_Declare(
   Catch2
   GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-  GIT_TAG        v2.13.1)
+  GIT_TAG        v3.5.1)
 
 FetchContent_MakeAvailable(Catch2)
 
 add_executable (basic_tests src/catch_main.cpp src/basic_tests.cpp)
 target_link_libraries(basic_tests PRIVATE shapeit_lib ${RDKIT_LIBRARIES} ${RDKit_THREAD_LIBS})
-target_link_libraries(basic_tests PRIVATE Catch2::Catch2)
+target_link_libraries(basic_tests PRIVATE Catch2::Catch2WithMain)
 add_test(basic_tests ${EXECUTABLE_OUTPUT_PATH}/basic_tests)
 endif(BUILD_RDKIT_SUPPORT)
 
