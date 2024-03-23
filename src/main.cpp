@@ -246,6 +246,8 @@ int main(int argc, char *argv[]) {
       res.rotor[0] = 1.0;
       bestScore = getScore(uo.whichScore, res.overlap, refVolume.overlap,
                            dbVolume.overlap);
+      bestSolution.refAtomVolume = refVolume.overlap;
+      updateSolutionInfo(bestSolution, res, bestScore, dbVolume);
     } else {
       initOrientation(dbVolume);
 
