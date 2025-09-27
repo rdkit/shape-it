@@ -61,6 +61,7 @@ Shape-it can be linked against either OpenBabel version 3 or the RDKit.
 #include <printHeader.h>
 #include <printUsage.h>
 #include <shapeAlignment.h>
+#include <memory>
 
 //*--------------------------------------------------------------------------*//
 //* MAIN                                                                MAIN
